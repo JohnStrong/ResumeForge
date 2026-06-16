@@ -44,6 +44,8 @@ pytest
 
 ## RCSS DSL
 
+> Grammar definition: [`src/resumeforge/grammar/rcss.lark`](src/resumeforge/grammar/rcss.lark)
+
 ### Section identification
 - A section begins at a heading line that matches the pattern ^{HEADING} (a full-line header like: LINKS, WORK EXPERIENCE, EDUCATION).
 - A section contains all text from that heading line up to the next heading line or EOF.
@@ -52,8 +54,7 @@ pytest
 ### .rcss basics (MVP)
 - File extension: .rcss
 - Supported properties: padding, margin, background-color, color, align, width (fr or fixed), gap, column-gap, font-size, line-height, display (block/inline), grid-column (1 or 2).
-- Grid mode supports exactly 2 columns. grid-column must be 1 or 2 for each section you place in the grid.
-- If a section has no grid-column in grid mode, it will be placed using a deterministic next-available-column policy.
+- Grid mode supports exactly 2 columns. grid-column must be 1 or 2 for each section in grid mode.
 
 ### Example .rcss snippets
 Single-column (resume-single.rcss)
@@ -84,7 +85,7 @@ section[name="MAIN"] {
 }
 
 section[name="HEADER"] {
-  /* In grid mode, header may omit grid-column to span or use placement policy */
+  grid-column: 1;
   padding: 8mm;
   align: center;
 }
