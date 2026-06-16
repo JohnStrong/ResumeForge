@@ -22,12 +22,6 @@ ResumeForge converts a plain UTF-8 text CV into a styled multi-page A4 PDF using
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
-```
-
-Or without a venv (for quick use):
-
-```bash
 pip install -e .
 ```
 

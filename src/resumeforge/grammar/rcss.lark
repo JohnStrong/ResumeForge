@@ -1,0 +1,17 @@
+start: rule+
+
+rule: selector "{" declaration+ "}"
+
+selector: "layout"                          -> layout_selector
+        | "section" "[" "name" "=" STRING "]" -> section_selector
+
+declaration: PROPERTY ":" value ";"
+
+value: VALUE+
+
+PROPERTY: /[a-z][a-z\-]*/
+VALUE: /[^\s;{}]+/
+STRING: "\"" /[^"]*/ "\""
+
+%ignore /\s+/
+%ignore /\/\*[^*]*\*\//
