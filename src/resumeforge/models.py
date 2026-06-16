@@ -22,3 +22,27 @@ class ParseResult:
     valid: bool
     message: str | None = None
     tree: Tree | None = None
+
+@dataclass
+class Declaration:
+    """A single property: value pair like 'padding: 8mm'"""
+    property: str
+    values: list[str]  # list because margins has 4 values: 20mm 18mm 20mm 18mm
+  
+@dataclass
+class LayoutRule:
+    """The layout { ... } block — page-level settings"""
+    declarations: list[Declaration]
+    # Convenience: pull out mode, columns, margins etc. later via helper methods
+  
+@dataclass
+class SectionRule:
+    """A section[name="..."] { ... } block — per-section styles"""
+    name: str  # the heading text, e.g. "HEADER", "WORK EXPERIENCE"
+    declarations: list[Declaration]
+  
+@dataclass
+class Stylesheet:
+    """The complete parsed .rcss file as domain objects"""
+    layout: LayoutRule # required — every .rcss must have a layout block
+    sections: list[SectionRule]
