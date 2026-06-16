@@ -31,7 +31,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 def cmd_render(args) -> int:
     """Render a resume for .txt + .rcss to PDF."""
-    print(f"Rendering {args.input} with style {args.style} -> {args.output}")
+    # 1. Parse the RCSS style file into a tree
+    text = Path(args.style).read_text()
+    result = RcssParser().parse(text, {"debug": True})
+    if not result.valid:
+        print(f"Invalid RCSS: {result.message}")
+        return 1
+
+    # 2. Transform tree into domain models (layout, sections, declarations)
+    # 3. Render PDF from input .txt using transformed style models
     return 0
 
 def cmd_validate(args) -> int:

@@ -99,17 +99,17 @@ Assume binary: resumeforge
 
 Single-column:
 ```bash
-resumeforge render --input resume.txt --style resume-single.rcss --layout single --output resume-single.pdf
+resumeforge render --input resume.txt --style resume-single.rcss --output resume-single.pdf
 ```
 
 Two-column grid:
 ```bash
-resumeforge render --input resume.txt --style resume-grid.rcss --layout grid --output resume-grid.pdf
+resumeforge render --input resume.txt --style examples/valid.rcss --output resume-grid.pdf
 ```
 
 Validate style file:
 ```bash
-resumeforge validate --style resume-grid.rcss
+resumeforge validate --style examples/valid.rcss
 ```
 
 ### Expected file formats
