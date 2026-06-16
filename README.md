@@ -28,10 +28,13 @@ pip install -e .
 ## Usage
 
 ```bash
-# Render a resume
+# Render a plain-text CV to styled PDF
 resumeforge render --input resume.txt --style resume-single.rcss --output resume.pdf
 
-# Show version
+# Validate an RCSS style file for syntax errors
+resumeforge validate --style resume-single.rcss
+
+# Print CLI version
 resumeforge version
 ```
 
@@ -106,7 +109,7 @@ resumeforge render --input resume.txt --style resume-grid.rcss --layout grid --o
 
 Validate style file:
 ```bash
-resumeforge validate-style --style resume-grid.rcss
+resumeforge validate --style resume-grid.rcss
 ```
 
 ### Expected file formats
