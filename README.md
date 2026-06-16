@@ -22,22 +22,19 @@ ResumeForge converts a plain UTF-8 text CV into a styled multi-page A4 PDF using
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
-```
-
-Or without a venv (for quick use):
-
-```bash
 pip install -e .
 ```
 
 ## Usage
 
 ```bash
-# Render a resume
+# Render a plain-text CV to styled PDF
 resumeforge render --input resume.txt --style resume-single.rcss --output resume.pdf
 
-# Show version
+# Validate an RCSS style file for syntax errors
+resumeforge validate --style resume-single.rcss
+
+# Print CLI version
 resumeforge version
 ```
 
@@ -50,6 +47,8 @@ pytest
 
 ## RCSS DSL
 
+> Grammar definition: [`src/resumeforge/grammar/rcss.lark`](src/resumeforge/grammar/rcss.lark)
+
 ### Section identification
 - A section begins at a heading line that matches the pattern ^{HEADING} (a full-line header like: LINKS, WORK EXPERIENCE, EDUCATION).
 - A section contains all text from that heading line up to the next heading line or EOF.
@@ -58,8 +57,7 @@ pytest
 ### .rcss basics (MVP)
 - File extension: .rcss
 - Supported properties: padding, margin, background-color, color, align, width (fr or fixed), gap, column-gap, font-size, line-height, display (block/inline), grid-column (1 or 2).
-- Grid mode supports exactly 2 columns. grid-column must be 1 or 2 for each section you place in the grid.
-- If a section has no grid-column in grid mode, it will be placed using a deterministic next-available-column policy.
+- Grid mode supports exactly 2 columns. grid-column must be 1 or 2 for each section in grid mode.
 
 ### Example .rcss snippets
 Single-column (resume-single.rcss)
@@ -90,7 +88,7 @@ section[name="MAIN"] {
 }
 
 section[name="HEADER"] {
-  /* In grid mode, header may omit grid-column to span or use placement policy */
+  grid-column: 1;
   padding: 8mm;
   align: center;
 }
@@ -101,17 +99,17 @@ Assume binary: resumeforge
 
 Single-column:
 ```bash
-resumeforge render --input resume.txt --style resume-single.rcss --layout single --output resume-single.pdf
+resumeforge render --input resume.txt --style resume-single.rcss --output resume-single.pdf
 ```
 
 Two-column grid:
 ```bash
-resumeforge render --input resume.txt --style resume-grid.rcss --layout grid --output resume-grid.pdf
+resumeforge render --input resume.txt --style examples/valid.rcss --output resume-grid.pdf
 ```
 
 Validate style file:
 ```bash
-resumeforge validate-style --style resume-grid.rcss
+resumeforge validate --style examples/valid.rcss
 ```
 
 ### Expected file formats

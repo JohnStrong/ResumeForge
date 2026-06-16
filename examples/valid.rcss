@@ -1,0 +1,3 @@
+layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
+section[name="HEADER"] { grid-column: 1; padding: 8mm; align: center; }
+section[name="EXPERIENCE"] { grid-column: 2; padding: 6mm; font-size: 12pt; }

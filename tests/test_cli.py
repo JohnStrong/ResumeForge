@@ -8,12 +8,15 @@ def test_version(capsys):
     assert "0.1.0" in capsys.readouterr().out
 
 
-def test_render_echo(capsys):
-    assert main(["render", "--input", "cv.txt", "--style", "s.rcss", "--output", "o.pdf"]) == 0
+def test_render_valid(capsys):
+    assert main(["render", "--input", "resume.txt", "--style", "examples/valid.rcss", "--output", "o.pdf"]) == 0
     out = capsys.readouterr().out
-    assert "cv.txt" in out
-    assert "s.rcss" in out
-    assert "o.pdf" in out
+    assert "start" in out
+
+def test_render_invalid(capsys):
+    assert main(["render", "--input", "resume.txt", "--style", "examples/invalid.rcss", "--output", "o.pdf"]) == 1
+    out = capsys.readouterr().out
+    assert "Invalid RCSS" in out
 
 
 def test_no_command():
