@@ -1,6 +1,11 @@
+"""Parser for RCSS DSL. Parse or Validate RCSS text"""
+
 # Lark is the parsing library that reads grammar/rcss.lark and builds a parse tree
 from lark import Lark
+from lark.exceptions import UnexpectedToken, UnexpectedCharacters
 from pathlib import Path
+
+from resumeforge.models import ValidationResult
 
 GRAMMAR_PATH = Path(__file__).parent / "grammar" / "rcss.lark"
 
@@ -9,6 +14,17 @@ class RcssParser:
         """Read the grammar and compile it"""
         grammer_text = GRAMMAR_PATH.read_text()
         self._parser = Lark(grammer_text, parser="lalr")
+
+    def validate(self, text: str):
+        "Validate a raw string against the rcss grammar"
+        try:
+            self._parser.parse(text)
+            return ValidationResult(valid = True)
+        except (UnexpectedToken, UnexpectedCharacters) as e:
+            return ValidationResult(
+                valid = False,
+                message = f"Line {e.line}, Col {e.column}: {e}"
+            )
     
     def parse(self, text: str, options: dict | None = None):
         """Parse a raw string using the rcss grammer"""

@@ -165,3 +165,59 @@ section[name=HEADER] { padding: 8mm; }
 """
         with pytest.raises((UnexpectedCharacters, UnexpectedToken)):
             parser.parse(rcss)
+
+
+class TestValidatePositive:
+    """Validate returns valid=True for correct RCSS."""
+
+    def test_valid_layout(self, parser):
+        result = parser.validate('layout { mode: single; }')
+        assert result.valid is True
+        assert result.message is None
+
+    def test_valid_section(self, parser):
+        result = parser.validate('section[name="HEADER"] { padding: 8mm; }')
+        assert result.valid is True
+        assert result.message is None
+
+    def test_valid_full(self, parser):
+        rcss = """\
+layout { mode: grid; columns: 2; }
+section[name="SIDEBAR"] { grid-column: 1; padding: 6mm; }
+section[name="MAIN"] { grid-column: 2; padding: 6mm; }
+"""
+        result = parser.validate(rcss)
+        assert result.valid is True
+        assert result.message is None
+
+
+class TestValidateNegative:
+    """Validate returns valid=False with a message for invalid RCSS."""
+
+    def test_invalid_selector(self, parser):
+        result = parser.validate('header { padding: 8mm; }')
+        assert result.valid is False
+        assert "Line 1, Col 1" in result.message
+        assert "LAYOUT" in result.message
+        assert "SECTION" in result.message
+
+    def test_missing_semicolon(self, parser):
+        result = parser.validate('layout { mode: single }')
+        assert result.valid is False
+        assert "SEMICOLON" in result.message
+        assert "RBRACE" in result.message
+
+    def test_missing_colon(self, parser):
+        result = parser.validate('layout { mode single; }')
+        assert result.valid is False
+        assert "COLON" in result.message
+
+    def test_empty_block(self, parser):
+        result = parser.validate('layout { }')
+        assert result.valid is False
+        assert "RBRACE" in result.message
+
+    def test_section_without_name(self, parser):
+        result = parser.validate('section { padding: 8mm; }')
+        assert result.valid is False
+        assert "LSQB" in result.message
