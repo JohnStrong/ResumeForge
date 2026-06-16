@@ -63,48 +63,54 @@ section[name="EDUCATION"] {
 
     def test_full_grammar_coverage(self, parser):
         """All grammar rules are exercised in one cohesive RCSS string."""
-        tree = parser.parse(self.FULL_COVERAGE_RCSS)
-        assert tree is not None
+        result = parser.parse(self.FULL_COVERAGE_RCSS)
+        assert result.valid is True
+        assert result.tree is not None
 
     def test_layout_selector(self, parser):
         rcss = """\
 /* POSITIVE: minimal layout rule */
 layout { mode: single; }
 """
-        tree = parser.parse(rcss)
-        assert tree is not None
+        result = parser.parse(rcss)
+        assert result.valid is True
+        assert result.tree is not None
 
     def test_section_selector(self, parser):
         rcss = """\
 /* POSITIVE: minimal section rule */
 section[name="LINKS"] { padding: 4mm; }
 """
-        tree = parser.parse(rcss)
-        assert tree is not None
+        result = parser.parse(rcss)
+        assert result.valid is True
+        assert result.tree is not None
 
     def test_multi_value_property(self, parser):
         rcss = """\
 /* POSITIVE: property with multiple space-separated values */
 layout { margins: 20mm 18mm 20mm 18mm; }
 """
-        tree = parser.parse(rcss)
-        assert tree is not None
+        result = parser.parse(rcss)
+        assert result.valid is True
+        assert result.tree is not None
 
     def test_hyphenated_property_names(self, parser):
         rcss = """\
 /* POSITIVE: hyphenated property names like grid-column, font-size */
 section[name="MAIN"] { grid-column: 2; font-size: 14pt; }
 """
-        tree = parser.parse(rcss)
-        assert tree is not None
+        result = parser.parse(rcss)
+        assert result.valid is True
+        assert result.tree is not None
 
     def test_comments_ignored(self, parser):
         rcss = """\
 /* POSITIVE: comments should not affect parsing */
 layout { /* inline comment */ mode: single; }
 """
-        tree = parser.parse(rcss)
-        assert tree is not None
+        result = parser.parse(rcss)
+        assert result.valid is True
+        assert result.tree is not None
 
 
 class TestInvalidRcss:
@@ -115,56 +121,63 @@ class TestInvalidRcss:
 /* NEGATIVE: unknown selector — only layout and section are valid */
 header { padding: 8mm; }
 """
-        with pytest.raises((UnexpectedCharacters, UnexpectedToken)):
-            parser.parse(rcss)
+        result = parser.parse(rcss)
+        assert result.valid is False
+        assert result.message is not None
 
     def test_section_missing_bracket_identifier(self, parser):
         rcss = """\
 /* NEGATIVE: section without [name="..."] identifier */
 section { padding: 8mm; }
 """
-        with pytest.raises((UnexpectedCharacters, UnexpectedToken)):
-            parser.parse(rcss)
+        result = parser.parse(rcss)
+        assert result.valid is False
+        assert result.message is not None
 
     def test_property_missing_colon(self, parser):
         rcss = """\
 /* NEGATIVE: property without colon separator */
 layout { mode single; }
 """
-        with pytest.raises((UnexpectedCharacters, UnexpectedToken)):
-            parser.parse(rcss)
+        result = parser.parse(rcss)
+        assert result.valid is False
+        assert result.message is not None
 
     def test_property_missing_semicolon(self, parser):
         rcss = """\
 /* NEGATIVE: property without semicolon terminator */
 layout { mode: single }
 """
-        with pytest.raises((UnexpectedCharacters, UnexpectedToken)):
-            parser.parse(rcss)
+        result = parser.parse(rcss)
+        assert result.valid is False
+        assert result.message is not None
 
     def test_property_missing_value(self, parser):
         rcss = """\
 /* NEGATIVE: property with colon but no value before semicolon */
 layout { mode: ; }
 """
-        with pytest.raises((UnexpectedCharacters, UnexpectedToken)):
-            parser.parse(rcss)
+        result = parser.parse(rcss)
+        assert result.valid is False
+        assert result.message is not None
 
     def test_empty_block(self, parser):
         rcss = """\
 /* NEGATIVE: rule with no declarations — grammar requires declaration+ */
 layout { }
 """
-        with pytest.raises((UnexpectedCharacters, UnexpectedToken)):
-            parser.parse(rcss)
+        result = parser.parse(rcss)
+        assert result.valid is False
+        assert result.message is not None
 
     def test_section_name_not_quoted(self, parser):
         rcss = """\
 /* NEGATIVE: section name without quotes */
 section[name=HEADER] { padding: 8mm; }
 """
-        with pytest.raises((UnexpectedCharacters, UnexpectedToken)):
-            parser.parse(rcss)
+        result = parser.parse(rcss)
+        assert result.valid is False
+        assert result.message is not None
 
 
 class TestValidatePositive:
@@ -221,3 +234,63 @@ class TestValidateNegative:
         result = parser.validate('section { padding: 8mm; }')
         assert result.valid is False
         assert "LSQB" in result.message
+
+
+class TestParseResultPositive:
+    """parse() returns ParseResult with valid=True and a tree on success."""
+
+    def test_returns_parse_result(self, parser):
+        from resumeforge.models import ParseResult
+        result = parser.parse('layout { mode: single; }')
+        assert isinstance(result, ParseResult)
+
+    def test_valid_is_true(self, parser):
+        result = parser.parse('layout { mode: single; }')
+        assert result.valid is True
+
+    def test_message_is_none(self, parser):
+        result = parser.parse('layout { mode: single; }')
+        assert result.message is None
+
+    def test_tree_is_not_none(self, parser):
+        result = parser.parse('layout { mode: grid; columns: 2; }')
+        assert result.tree is not None
+
+    def test_tree_has_start_root(self, parser):
+        result = parser.parse('section[name="HEADER"] { padding: 8mm; }')
+        assert result.tree.data == "start"
+
+    def test_tree_contains_rules(self, parser):
+        rcss = """\
+layout { mode: grid; columns: 2; }
+section[name="MAIN"] { grid-column: 2; padding: 6mm; }
+"""
+        result = parser.parse(rcss)
+        assert len(result.tree.children) == 2
+
+
+class TestParseResultNegative:
+    """parse() returns ParseResult with valid=False and no tree on failure."""
+
+    def test_invalid_returns_parse_result(self, parser):
+        from resumeforge.models import ParseResult
+        result = parser.parse('header { padding: 8mm; }')
+        assert isinstance(result, ParseResult)
+
+    def test_valid_is_false(self, parser):
+        result = parser.parse('header { padding: 8mm; }')
+        assert result.valid is False
+
+    def test_tree_is_none(self, parser):
+        result = parser.parse('layout { mode: single }')
+        assert result.tree is None
+
+    def test_message_present(self, parser):
+        result = parser.parse('layout { mode: single }')
+        assert result.message is not None
+        assert "SEMICOLON" in result.message
+
+    def test_message_has_location(self, parser):
+        result = parser.parse('header { padding: 8mm; }')
+        assert "Line 1" in result.message
+        assert "Col 1" in result.message
