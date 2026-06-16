@@ -2,6 +2,9 @@
 
 ## Table of Contents
 - [About](#about)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Testing](#testing)
 - [RCSS DSL](#rcss-dsl)
   - [Section identification](#section-identification)
   - [.rcss basics (MVP)](#rcss-basics-mvp)
@@ -13,6 +16,37 @@
 
 ## About
 ResumeForge converts a plain UTF-8 text CV into a styled multi-page A4 PDF using a small CSS-like DSL (.rcss). Supports two layout modes: standard (single-column) and grid (2-column). MVP excludes font-face loading and decorative assets.
+
+## Setup
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+Or without a venv (for quick use):
+
+```bash
+pip install -e .
+```
+
+## Usage
+
+```bash
+# Render a resume
+resumeforge render --input resume.txt --style resume-single.rcss --output resume.pdf
+
+# Show version
+resumeforge version
+```
+
+## Testing
+
+```bash
+pip install pytest
+pytest
+```
 
 ## RCSS DSL
 
