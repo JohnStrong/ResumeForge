@@ -46,3 +46,10 @@ class Stylesheet:
     """The complete parsed .rcss file as domain objects"""
     layout: LayoutRule # required — every .rcss must have a layout block
     sections: list[SectionRule]
+
+@dataclass
+class StyledSection:
+    """Encapsulated str content with its section rule from a Stylesheet"""
+    name: str
+    content: str
+    rule: SectionRule
