@@ -4,6 +4,7 @@
 - [About](#about)
 - [Setup](#setup)
 - [Usage](#usage)
+  - [Troubleshooting](#troubleshooting)
 - [Testing](#testing)
 - [RCSS DSL](#rcss-dsl)
   - [Section identification](#section-identification)
@@ -37,6 +38,26 @@ resumeforge validate --style resume-single.rcss
 # Print CLI version
 resumeforge version
 ```
+
+### Troubleshooting
+
+**"Unexpected token ... Expected one of: LAYOUT, SECTION"**
+Your `.rcss` file has an invalid selector. Only `layout { ... }` and `section[name="..."] { ... }` are valid. Check for typos in the selector keyword.
+
+**"Unexpected token ... Expected one of: SEMICOLON"**
+A property declaration is missing its trailing semicolon. Every declaration must end with `;`.
+
+**"RCSS must contain a layout { ... } rule"**
+The transformer could not find a `layout` block in your `.rcss` file. Every stylesheet requires one.
+
+**"RCSS must contain at least one section[name=...] rule"**
+Your `.rcss` defines a layout but no section rules. Add at least one `section[name="..."] { ... }` block.
+
+**"No sections found in CV text matching the stylesheet"**
+The headings in your `.txt` file don't match any `section[name="..."]` values in the stylesheet. Headings must match exactly (case-sensitive, full line).
+
+**"CV text is missing one or more sections defined in the stylesheet"**
+Your `.txt` file is missing a heading that the stylesheet expects. Ensure every `section[name="..."]` in the `.rcss` has a corresponding heading line in the CV text.
 
 ## Testing
 

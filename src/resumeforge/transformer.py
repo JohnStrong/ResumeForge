@@ -2,6 +2,7 @@
 
 from lark import Transformer, Token, Tree
 from resumeforge.models import Declaration, LayoutRule, SectionRule, Stylesheet
+from resumeforge.validator import run_validators
 
 STYLESHEET_RULE_VALIDATORS = [
     {
@@ -24,11 +25,6 @@ class RcssTransformer(Transformer):
     def _log(self, rule_name: str, items):
         if self._debug:
             print(f"[{rule_name}] {items}")
-
-    def _validate_stylesheet(self, layout: LayoutRule | None, sections: list[SectionRule]):
-        for validator in STYLESHEET_RULE_VALIDATORS:
-            if not validator['check'](layout, sections):
-                raise ValueError(validator['message'])
 
     def value(self, items) -> list[str]:
         """Extract values from TOKEN array. 
@@ -94,7 +90,7 @@ class RcssTransformer(Transformer):
             else:
                 sections.append(rule)
         
-        self._validate_stylesheet(layout, sections)
+        run_validators(STYLESHEET_RULE_VALIDATORS, layout, sections)
         return Stylesheet(layout=layout, sections=sections)
 
 

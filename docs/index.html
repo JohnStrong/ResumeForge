@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResumeForge — Plain-text CV to PDF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #306998;
@@ -25,16 +26,59 @@
             color: #fff;
             padding: 3rem 1rem;
             text-align: center;
+            overflow: hidden;
+            position: relative;
         }
-        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+        }
+        @keyframes shine {
+            0% { left: -100%; }
+            60% { left: 100%; }
+            100% { left: 100%; }
+        }
+        header h1 { font-family: "Cinzel", serif; font-size: 2.5rem; margin-bottom: 0.5rem; }
         header p { font-size: 1.15rem; opacity: 0.9; max-width: 600px; margin: 0 auto; }
-        main { max-width: 720px; margin: 0 auto; padding: 2rem 1rem; }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; display: flex; gap: 2rem; }
+        nav {
+            position: sticky;
+            top: 1rem;
+            align-self: flex-start;
+            min-width: 180px;
+            font-size: 0.85rem;
+        }
+        nav ul { list-style: none; padding: 0; }
+        nav li { margin-bottom: 0.3rem; }
+        nav a { text-decoration: none; color: var(--text); }
+        nav a:hover { color: var(--primary); }
+        nav details { margin-bottom: 0.4rem; }
+        nav details summary { cursor: pointer; font-weight: 600; color: var(--primary); list-style: none; }
+        nav details summary::-webkit-details-marker { display: none; }
+        nav a.active::before {
+            content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23306998' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 17.5L3 6V3h3l11.5 11.5'/%3E%3Cpath d='M13 19l6-6'/%3E%3Cpath d='M16 16l4 4'/%3E%3Cpath d='M19 21l2-2'/%3E%3C/svg%3E");
+            margin-right: 0.3rem;
+        }
+        nav a.active {
+            color: var(--primary);
+            text-decoration: underline;
+            text-decoration-color: var(--primary);
+            text-underline-offset: 3px;
+        }
+        nav details ul { padding-left: 1rem; margin-top: 0.3rem; }
+        main { flex: 1; min-width: 0; }
         h2 {
+            font-family: "Cinzel", serif;
             font-size: 1.4rem;
             margin: 2rem 0 0.75rem;
             padding-bottom: 0.3rem;
             border-bottom: 2px solid var(--accent);
         }
+        h3 { font-family: "Cinzel", serif; margin: 1.25rem 0 0.5rem; }
         p, li { margin-bottom: 0.5rem; }
         ul { padding-left: 1.25rem; }
         pre {
@@ -58,14 +102,20 @@
         .badge-working { background: #d4edda; color: #155724; }
         .badge-planned { background: #fff3cd; color: #856404; }
         a { color: var(--primary); }
+        .troubleshoot-item { margin-bottom: 1rem; }
+        .troubleshoot-item strong { display: block; font-family: "SF Mono", Menlo, monospace; font-size: 0.85rem; }
         footer {
-            max-width: 720px;
+            max-width: 900px;
             margin: 3rem auto 0;
             padding: 1.5rem 1rem;
             border-top: 1px solid var(--border);
             font-size: 0.85rem;
             color: #666;
             text-align: center;
+        }
+        @media (max-width: 700px) {
+            .container { flex-direction: column; }
+            nav { position: static; }
         }
     </style>
 </head>
@@ -74,46 +124,117 @@
         <h1>ResumeForge</h1>
         <p>Convert plain-text CVs into styled multi-page A4 PDFs using a small CSS-like DSL (.rcss)</p>
     </header>
-    <main>
-        <h2>About</h2>
-        <p>ResumeForge parses section headings from a plain UTF-8 text file, applies styles defined in an <code>.rcss</code> file, and outputs a paginated A4 PDF. Supports single-column and 2-column grid layouts.</p>
+    <div class="container">
+        <nav>
+            <details open>
+                <summary>Contents</summary>
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li>
+                        <a href="#commands">Commands</a>
+                        <ul>
+                            <li><a href="#validate">validate</a></li>
+                            <li><a href="#render">render</a></li>
+                            <li><a href="#version">version</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#rcss-dsl">RCSS DSL</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                </ul>
+            </details>
+        </nav>
+        <main>
+            <h2 id="about">About</h2>
+            <p>ResumeForge parses section headings from a plain UTF-8 text file, applies styles defined in an <code>.rcss</code> file, and outputs a paginated A4 PDF. Supports single-column and 2-column grid layouts.</p>
 
-        <h2>Installation</h2>
-        <p>Clone the repository and install in editable mode:</p>
-        <pre><code>git clone git@github.com:JohnStrong/ResumeForge.git
+            <h2 id="installation">Installation</h2>
+            <p>Clone the repository and install in editable mode:</p>
+            <pre><code>git clone git@github.com:JohnStrong/ResumeForge.git
 cd ResumeForge
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .</code></pre>
-        <p>Source: <a href="https://github.com/JohnStrong/ResumeForge">github.com/JohnStrong/ResumeForge</a></p>
+            <p>Source: <a href="https://github.com/JohnStrong/ResumeForge">github.com/JohnStrong/ResumeForge</a></p>
 
-        <h2>Commands</h2>
+            <h2 id="commands">Commands</h2>
 
-        <h3>validate <span class="badge badge-working">working</span></h3>
-        <p>Validate an RCSS style file for syntax errors. Reports the first error with line and column number.</p>
-        <pre><code>resumeforge validate --style resume.rcss</code></pre>
+            <h3 id="validate">validate <span class="badge badge-working">working</span></h3>
+            <p>Validate an RCSS style file for syntax errors. Reports the first error with line and column number.</p>
+            <pre><code>resumeforge validate --style resume.rcss</code></pre>
 
-        <h3>render <span class="badge badge-planned">planned</span></h3>
-        <p>Render a plain-text CV to a styled PDF using an RCSS style file.</p>
-        <pre><code>resumeforge render --input resume.txt --style resume.rcss --output resume.pdf</code></pre>
+            <h3 id="render">render <span class="badge badge-planned">planned</span></h3>
+            <p>Render a plain-text CV to a styled PDF using an RCSS style file.</p>
+            <pre><code>resumeforge render --input resume.txt --style resume.rcss --output resume.pdf</code></pre>
 
-        <h3>version</h3>
-        <pre><code>resumeforge version</code></pre>
+            <h3 id="version">version</h3>
+            <pre><code>resumeforge version</code></pre>
 
-        <h2>RCSS DSL</h2>
-        <p>RCSS is a minimal CSS-like language with two selector types:</p>
-        <ul>
-            <li><code>layout { ... }</code> — page-level settings (mode, columns, margins)</li>
-            <li><code>section[name="HEADING"] { ... }</code> — per-section styles matched by heading text</li>
-        </ul>
-        <pre><code>layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
+            <h2 id="rcss-dsl">RCSS DSL</h2>
+            <p>RCSS is a minimal CSS-like language with two selector types:</p>
+            <ul>
+                <li><code>layout { ... }</code> — page-level settings (mode, columns, margins)</li>
+                <li><code>section[name="HEADING"] { ... }</code> — per-section styles matched by heading text</li>
+            </ul>
+            <pre><code>layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
 
 section[name="HEADER"] { grid-column: 1; padding: 8mm; align: center; }
 section[name="EXPERIENCE"] { grid-column: 2; padding: 6mm; font-size: 12pt; }</code></pre>
-    </main>
+
+            <h2 id="troubleshooting">Troubleshooting</h2>
+
+            <div class="troubleshoot-item">
+                <strong>"Unexpected token ... Expected one of: LAYOUT, SECTION"</strong>
+                <p>Invalid selector in your <code>.rcss</code> file. Only <code>layout { }</code> and <code>section[name="..."] { }</code> are valid.</p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"Unexpected token ... Expected one of: SEMICOLON"</strong>
+                <p>A property declaration is missing its trailing semicolon. Every declaration must end with <code>;</code></p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"RCSS must contain a layout { ... } rule"</strong>
+                <p>Your stylesheet has no <code>layout</code> block. Every <code>.rcss</code> file requires one.</p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"RCSS must contain at least one section[name=...] rule"</strong>
+                <p>Your stylesheet defines a layout but no section rules. Add at least one <code>section[name="..."] { }</code> block.</p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"No sections found in CV text matching the stylesheet"</strong>
+                <p>The headings in your <code>.txt</code> file don't match any <code>section[name="..."]</code> values. Headings must match exactly (case-sensitive, full line).</p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"CV text is missing one or more sections defined in the stylesheet"</strong>
+                <p>Your <code>.txt</code> file is missing a heading the stylesheet expects. Ensure every <code>section[name="..."]</code> has a matching heading line.</p>
+            </div>
+        </main>
+    </div>
     <footer>
         <p>MIT License &copy; 2026 John Joseph Strong</p>
         <p>Built with Python &middot; Parsed with <a href="https://github.com/lark-parser/lark">Lark</a></p>
     </footer>
+    <script>
+        const navLinks = document.querySelectorAll('nav a[href^="#"]');
+        const sections = [...navLinks].map(a => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+
+        function updateActive() {
+            let current = sections[0];
+            for (const s of sections) {
+                if (s.getBoundingClientRect().top <= 80) current = s;
+            }
+            navLinks.forEach(a => {
+                a.classList.toggle('active', a.getAttribute('href') === '#' + current.id);
+            });
+        }
+
+        window.addEventListener('scroll', updateActive);
+        window.addEventListener('hashchange', updateActive);
+        updateActive();
+    </script>
 </body>
 </html>

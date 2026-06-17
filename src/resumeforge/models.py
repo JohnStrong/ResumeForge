@@ -46,3 +46,26 @@ class Stylesheet:
     """The complete parsed .rcss file as domain objects"""
     layout: LayoutRule # required — every .rcss must have a layout block
     sections: list[SectionRule]
+
+@dataclass
+class StyledSection:
+    """Encapsulated str content with its section rule from a Stylesheet"""
+    name: str
+    content: str
+    rule: SectionRule
+    order: int
+
+@dataclass
+class RawSection:
+    """A section extracted from raw CV text, before style rules are applied."""
+    name: str
+    content: str
+    order: int
+
+    @staticmethod
+    def fromText(name: str, content: list[str], order: int) -> 'RawSection':
+        return RawSection(
+            name=name,
+            content="\n".join(content),
+            order=order
+        )
