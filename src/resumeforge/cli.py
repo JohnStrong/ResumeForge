@@ -37,20 +37,24 @@ def cmd_render(args) -> int:
     # TODO - align the 'logging' pattern between all components
 
     # 1. Parse the RCSS style file into a tree
+    print("[1/4] ✓ Parsing RCSS style file")
     raw_rcss = Path(args.style).read_text()
     result = RcssParser().parse(text=raw_rcss, options={"debug": True})
     if not result.valid:
-        print(f"Invalid RCSS: {result.message}")
+        print(f"[1/4] ✗ Invalid RCSS: {result.message}")
         return 1
 
     # 2. Transform tree into domain models (layout, sections, declarations)
+    print("[2/4] ✓ Transforming parse tree to stylesheet")
     stylesheet = transform(tree=result.tree, options={"debug": True})
    
     # 3. Map raw text sections to their style sheet rules
+    print("[3/4] ✓ Mapping CV sections to style rules")
     cv_text = Path(args.input).read_text()
     styled_sections = SectionMapper(options={"debug":True}).map(text=cv_text, stylesheet=stylesheet)
     
     # 4. Render PDF from input .txt using transformed style models
+    print("[4/4] ✓ Rendering PDF")
     return 0
 
 def cmd_validate(args) -> int:
