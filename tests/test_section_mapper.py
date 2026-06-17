@@ -92,3 +92,43 @@ class TestSplitSections:
         text = "Just some\nrandom text\nwith no headings"
         result = mapper._split_sections(text, SECTION_NAMES)
         assert result == []
+
+
+class TestMapValidation:
+    """Tests for validation in SectionMapper.map()."""
+
+    def _make_stylesheet(self):
+        from resumeforge.models import Stylesheet, LayoutRule, SectionRule, Declaration
+        return Stylesheet(
+            layout=LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            sections=[SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])])]
+        )
+
+    def test_empty_text_raises(self, mapper):
+        """NEGATIVE: empty CV text raises ValueError — no sections found"""
+        with pytest.raises(ValueError, match="No sections found"):
+            mapper.map("", self._make_stylesheet())
+
+    def test_whitespace_only_raises(self, mapper):
+        """NEGATIVE: whitespace-only CV text raises ValueError"""
+        with pytest.raises(ValueError, match="No sections found"):
+            mapper.map("   \n\n  \n", self._make_stylesheet())
+
+    def test_no_matching_headings_raises(self, mapper):
+        """NEGATIVE: CV text with no headings matching stylesheet raises ValueError"""
+        with pytest.raises(ValueError, match="No sections found"):
+            mapper.map("Just some random text\nwith no known headings", self._make_stylesheet())
+
+    def test_missing_section_raises(self, mapper):
+        """NEGATIVE: CV text missing a stylesheet section raises ValueError"""
+        from resumeforge.models import Stylesheet, LayoutRule, SectionRule, Declaration
+        stylesheet = Stylesheet(
+            layout=LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            sections=[
+                SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
+                SectionRule(name="EXPERIENCE", declarations=[Declaration(property="padding", values=["6mm"])]),
+            ]
+        )
+        # CV only has HEADER, missing EXPERIENCE
+        with pytest.raises(ValueError, match="missing one or more sections"):
+            mapper.map("HEADER\nJohn Smith", stylesheet)

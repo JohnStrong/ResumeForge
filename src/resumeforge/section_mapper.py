@@ -1,7 +1,19 @@
 """Maps raw CV text sections to their corresponding RCSS style rules."""
 
 from resumeforge.models import Stylesheet, StyledSection, RawSection
+from resumeforge.validator import run_validators
 
+SECTION_MAPPER_VALIDATORS = [
+    {
+        "check": lambda raw_sections, section_names: len(raw_sections) > 0,
+        "message": "No sections found in CV text matching the stylesheet. "
+                    "Ensure headings match section[name=\"...\"] values exactly.",
+    },
+    {
+        "check": lambda raw_sections, section_names: {s.name for s in raw_sections} == section_names,
+        "message": "CV text is missing one or more sections defined in the stylesheet.",
+    },
+]
 
 class SectionMapper:
     """Splits a plain-text CV into sections and pairs each with its RCSS style rule.
@@ -71,4 +83,5 @@ class SectionMapper:
         """
         section_names = {s.name for s in stylesheet.sections}
         raw_sections = self._split_sections(text=text, section_names=section_names)
+        run_validators(SECTION_MAPPER_VALIDATORS, raw_sections, section_names)
         return self._apply_rules(raw_sections=raw_sections, stylesheet=stylesheet)
