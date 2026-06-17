@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 
 from resumeforge.parser import RcssParser
+from resumeforge.transformer import transform
+from resumeforge.section_mapper import SectionMapper
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -31,15 +33,24 @@ def build_parser() -> argparse.ArgumentParser:
 
 def cmd_render(args) -> int:
     """Render a resume for .txt + .rcss to PDF."""
+
+    # TODO - align the 'logging' pattern between all components
+
     # 1. Parse the RCSS style file into a tree
-    text = Path(args.style).read_text()
-    result = RcssParser().parse(text, {"debug": True})
+    raw_rcss = Path(args.style).read_text()
+    result = RcssParser().parse(text=raw_rcss, options={"debug": True})
     if not result.valid:
         print(f"Invalid RCSS: {result.message}")
         return 1
 
     # 2. Transform tree into domain models (layout, sections, declarations)
-    # 3. Render PDF from input .txt using transformed style models
+    stylesheet = transform(tree=result.tree, options={"debug": True})
+   
+    # 3. Map raw text sections to their style sheet rules
+    cv_text = Path(args.input).read_text()
+    styled_sections = SectionMapper(options={"debug":True}).map(text=cv_text, stylesheet=stylesheet)
+    
+    # 4. Render PDF from input .txt using transformed style models
     return 0
 
 def cmd_validate(args) -> int:

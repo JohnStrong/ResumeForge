@@ -9,7 +9,7 @@ def test_version(capsys):
 
 
 def test_render_valid(capsys):
-    assert main(["render", "--input", "resume.txt", "--style", "examples/valid.rcss", "--output", "o.pdf"]) == 0
+    assert main(["render", "--input", "examples/resume.txt", "--style", "examples/valid.rcss", "--output", "o.pdf"]) == 0
     out = capsys.readouterr().out
     assert "start" in out
 

@@ -1,0 +1,7 @@
+HEADER
+John Smith
+john@example.com
+
+EXPERIENCE
+Senior Engineer at ACME Corp
+- Built scalable microservices
