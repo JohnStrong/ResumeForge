@@ -53,6 +53,7 @@ class StyledSection:
     name: str
     content: str
     rule: SectionRule
+    order: int
 
 @dataclass
 class RawSection:

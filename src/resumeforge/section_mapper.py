@@ -3,15 +3,19 @@
 from resumeforge.models import Stylesheet, StyledSection, RawSection
 from resumeforge.validator import run_validators
 
-SECTION_MAPPER_VALIDATORS = [
+MAP_VALIDATORS = [
     {
-        "check": lambda raw_sections, section_names: len(raw_sections) > 0,
+        "check": lambda raw_sections, _: len(raw_sections) > 0,
         "message": "No sections found in CV text matching the stylesheet. "
                     "Ensure headings match section[name=\"...\"] values exactly.",
     },
     {
-        "check": lambda raw_sections, section_names: {s.name for s in raw_sections} == section_names,
+        "check": lambda raw_sections, rules_by_name: set(rules_by_name.keys()) == {s.name for s in raw_sections},
         "message": "CV text is missing one or more sections defined in the stylesheet.",
+    },
+    {
+        "check": lambda raw_sections, rules_by_name: all(s.name in rules_by_name for s in raw_sections),
+        "message": "No matching stylesheet rule for one or more sections.",
     },
 ]
 
@@ -68,20 +72,21 @@ class SectionMapper:
 
         return sections
 
-    def _apply_rules(self, raw_sections: list[tuple[str, str]], stylesheet: Stylesheet) -> list[StyledSection]:
-        """Match each (name, content) pair to its SectionRule from the stylesheet.
-
-        Returns a list of StyledSection objects ready for rendering.
-        """
-        pass
+    def _apply_rules(self, raw_sections: list[RawSection], rules_by_name: dict) -> list[StyledSection]:
+        """Match each raw section to its SectionRule. Pure transformation — no validation."""
+        return [
+            StyledSection(name=s.name, content=s.content, rule=rules_by_name[s.name], order=s.order)
+            for s in raw_sections
+        ]
         
     def map(self, text: str, stylesheet: Stylesheet) -> list[StyledSection]:
         """Map raw CV text to a list of StyledSection objects.
 
-        Splits the text into sections by heading, then pairs each section
-        with its matching SectionRule from the stylesheet.
+        Splits the text into sections by heading, validates, then pairs each
+        section with its matching SectionRule from the stylesheet.
         """
         section_names = {s.name for s in stylesheet.sections}
+        rules_by_name = {rule.name: rule for rule in stylesheet.sections}
         raw_sections = self._split_sections(text=text, section_names=section_names)
-        run_validators(SECTION_MAPPER_VALIDATORS, raw_sections, section_names)
-        return self._apply_rules(raw_sections=raw_sections, stylesheet=stylesheet)
+        run_validators(MAP_VALIDATORS, raw_sections, rules_by_name)
+        return self._apply_rules(raw_sections=raw_sections, rules_by_name=rules_by_name)

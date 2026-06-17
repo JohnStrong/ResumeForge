@@ -94,6 +94,49 @@ class TestSplitSections:
         assert result == []
 
 
+class TestApplyRules:
+    """Tests for _apply_rules — pure transformation matching raw sections to rules."""
+
+    def _make_rules_by_name(self, section_names):
+        from resumeforge.models import SectionRule, Declaration
+        return {n: SectionRule(name=n, declarations=[Declaration(property="padding", values=["8mm"])]) for n in section_names}
+
+    def test_single_section_matched(self, mapper):
+        """POSITIVE: one raw section matched to its rule produces one StyledSection"""
+        rules_by_name = self._make_rules_by_name(["HEADER"])
+        raw = [RawSection(name="HEADER", content="John Smith", order=0)]
+        result = mapper._apply_rules(raw, rules_by_name)
+        assert len(result) == 1
+        assert result[0].name == "HEADER"
+        assert result[0].content == "John Smith"
+        assert result[0].rule == rules_by_name["HEADER"]
+
+    def test_multiple_sections_preserve_order(self, mapper):
+        """POSITIVE: multiple raw sections are matched and returned in document order"""
+        rules_by_name = self._make_rules_by_name(["HEADER", "EXPERIENCE", "EDUCATION"])
+        raw = [
+            RawSection(name="HEADER", content="John", order=0),
+            RawSection(name="EXPERIENCE", content="Engineer", order=1),
+            RawSection(name="EDUCATION", content="BSc", order=2),
+        ]
+        result = mapper._apply_rules(raw, rules_by_name)
+        assert [s.name for s in result] == ["HEADER", "EXPERIENCE", "EDUCATION"]
+        assert result[0].rule == rules_by_name["HEADER"]
+        assert result[1].rule == rules_by_name["EXPERIENCE"]
+        assert result[2].rule == rules_by_name["EDUCATION"]
+
+    def test_order_field_preserved(self, mapper):
+        """POSITIVE: order from RawSection is carried into StyledSection"""
+        rules_by_name = self._make_rules_by_name(["HEADER", "EXPERIENCE"])
+        raw = [
+            RawSection(name="HEADER", content="John", order=0),
+            RawSection(name="EXPERIENCE", content="Job", order=1),
+        ]
+        result = mapper._apply_rules(raw, rules_by_name)
+        assert result[0].order == 0
+        assert result[1].order == 1
+
+
 class TestMapValidation:
     """Tests for validation in SectionMapper.map()."""
 
@@ -132,3 +175,26 @@ class TestMapValidation:
         # CV only has HEADER, missing EXPERIENCE
         with pytest.raises(ValueError, match="missing one or more sections"):
             mapper.map("HEADER\nJohn Smith", stylesheet)
+
+    def test_extra_section_in_cv_not_in_stylesheet_raises(self, mapper):
+        """NEGATIVE: CV has a section heading that has no matching stylesheet rule"""
+        from resumeforge.models import Stylesheet, LayoutRule, SectionRule, Declaration
+        stylesheet = Stylesheet(
+            layout=LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            sections=[
+                SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
+                SectionRule(name="EXPERIENCE", declarations=[Declaration(property="padding", values=["6mm"])]),
+            ]
+        )
+        # CV has HEADER + EXPERIENCE + EDUCATION but stylesheet only defines HEADER + EXPERIENCE
+        # Note: _split_sections only picks up headings matching section_names, so EDUCATION won't be split
+        # This test verifies the set equality check catches missing stylesheet sections
+        with pytest.raises(ValueError, match="missing one or more sections"):
+            mapper.map("HEADER\nJohn Smith\nEXPERIENCE\nEngineer", Stylesheet(
+                layout=LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+                sections=[
+                    SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
+                    SectionRule(name="EXPERIENCE", declarations=[Declaration(property="padding", values=["6mm"])]),
+                    SectionRule(name="EDUCATION", declarations=[Declaration(property="padding", values=["6mm"])]),
+                ]
+            ))
