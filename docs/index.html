@@ -212,6 +212,16 @@ section[name="EXPERIENCE"] { grid-column: 2; padding: 6mm; font-size: 12pt; }</c
                 <strong>"CV text is missing one or more sections defined in the stylesheet"</strong>
                 <p>Your <code>.txt</code> file is missing a heading the stylesheet expects. Ensure every <code>section[name="..."]</code> has a matching heading line.</p>
             </div>
+
+            <div class="troubleshoot-item">
+                <strong>"No raw sections to apply rules to"</strong>
+                <p>The section mapper received no parsed sections to style. This typically means your CV text was empty or contained no lines matching any stylesheet section names.</p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"No matching stylesheet rule for one or more sections"</strong>
+                <p>A section was parsed from the CV text but has no corresponding <code>section[name="..."]</code> rule in the stylesheet. Ensure every heading in your <code>.txt</code> file has a matching rule in the <code>.rcss</code>.</p>
+            </div>
         </main>
     </div>
     <footer>

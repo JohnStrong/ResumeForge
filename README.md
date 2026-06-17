@@ -59,6 +59,12 @@ The headings in your `.txt` file don't match any `section[name="..."]` values in
 **"CV text is missing one or more sections defined in the stylesheet"**
 Your `.txt` file is missing a heading that the stylesheet expects. Ensure every `section[name="..."]` in the `.rcss` has a corresponding heading line in the CV text.
 
+**"No raw sections to apply rules to"**
+The section mapper received no parsed sections to style. This typically means your CV text was empty or contained no lines matching any stylesheet section names.
+
+**"No matching stylesheet rule for one or more sections"**
+A section was parsed from the CV text but has no corresponding `section[name="..."]` rule in the stylesheet. Ensure every heading in your `.txt` file has a matching rule in the `.rcss`.
+
 ## Testing
 
 ```bash
