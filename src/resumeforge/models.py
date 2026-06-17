@@ -53,3 +53,18 @@ class StyledSection:
     name: str
     content: str
     rule: SectionRule
+
+@dataclass
+class RawSection:
+    """A section extracted from raw CV text, before style rules are applied."""
+    name: str
+    content: str
+    order: int
+
+    @staticmethod
+    def fromText(name: str, content: list[str], order: int) -> 'RawSection':
+        return RawSection(
+            name=name,
+            content="\n".join(content),
+            order=order
+        )
