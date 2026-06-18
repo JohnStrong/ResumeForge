@@ -163,7 +163,7 @@ pip install -e .</code></pre>
             <p>Validate an RCSS style file for syntax errors. Reports the first error with line and column number.</p>
             <pre><code>resumeforge validate --style resume.rcss</code></pre>
 
-            <h3 id="render">render <span class="badge badge-planned">planned</span></h3>
+            <h3 id="render">render <span class="badge badge-working">working</span></h3>
             <p>Render a plain-text CV to a styled PDF using an RCSS style file.</p>
             <pre><code>resumeforge render --input resume.txt --style resume.rcss --output resume.pdf</code></pre>
 
@@ -176,6 +176,39 @@ pip install -e .</code></pre>
                 <li><code>layout { ... }</code> — page-level settings (mode, columns, margins)</li>
                 <li><code>section[name="HEADING"] { ... }</code> — per-section styles matched by heading text</li>
             </ul>
+
+            <h3>Layout properties</h3>
+            <p>Used inside <code>layout { ... }</code>:</p>
+            <ul>
+                <li><code>mode</code> — <code>single</code> or <code>grid</code></li>
+                <li><code>columns</code> — number of columns (grid mode, currently <code>2</code>)</li>
+                <li><code>column-gap</code> — gap between columns (e.g. <code>6mm</code>)</li>
+                <li><code>margins</code> — page margins: top right bottom left (e.g. <code>20mm 18mm 20mm 18mm</code>)</li>
+            </ul>
+
+            <h3>Section style properties</h3>
+            <p>PDF render mode — applied as PDF state before writing content:</p>
+            <ul>
+                <li><code>font-size</code> — text size (e.g. <code>12pt</code>)</li>
+                <li><code>color</code> — text color in hex (e.g. <code>#333333</code>)</li>
+                <li><code>background-color</code> — section fill color in hex (e.g. <code>#f0f0f0</code>)</li>
+            </ul>
+
+            <h3>Section write properties</h3>
+            <p>PDF render mode — control how content is rendered:</p>
+            <ul>
+                <li><code>align</code> — <code>left</code>, <code>center</code>, or <code>right</code></li>
+                <li><code>line-height</code> — line height in mm (e.g. <code>7</code>)</li>
+                <li><code>display</code> — <code>block</code> (multi-line wrap) or <code>inline</code> (horizontal flow)</li>
+            </ul>
+
+            <h3>Section layout positioning (grid mode)</h3>
+            <ul>
+                <li><code>grid-column</code> — <code>1</code> or <code>2</code></li>
+                <li><code>padding</code> — inner spacing (e.g. <code>8mm</code>)</li>
+                <li><code>width</code> — proportional column width (e.g. <code>1fr</code>)</li>
+            </ul>
+
             <pre><code>layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
 
 section[name="HEADER"] { grid-column: 1; padding: 8mm; align: center; }

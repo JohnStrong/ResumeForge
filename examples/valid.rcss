@@ -1,3 +1,40 @@
 layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
-section[name="HEADER"] { grid-column: 1; padding: 8mm; align: center; }
-section[name="EXPERIENCE"] { grid-column: 2; padding: 6mm; font-size: 12pt; }
+
+section[name="HEADER"] {
+  font-size: 14pt;
+  align: center;
+  line-height: 7;
+  grid-column: 1;
+}
+
+section[name="LINKS"] {
+  font-size: 10pt;
+  color: #336699;
+  line-height: 6;
+  grid-column: 1;
+}
+
+section[name="SKILLS"] {
+  font-size: 10pt;
+  line-height: 6;
+  grid-column: 1;
+}
+
+section[name="WORK EXPERIENCE"] {
+  font-size: 10pt;
+  line-height: 6;
+  grid-column: 2;
+}
+
+section[name="EDUCATION"] {
+  font-size: 10pt;
+  line-height: 6;
+  grid-column: 2;
+}
+
+section[name="REFERENCES"] {
+  font-size: 9pt;
+  color: #666666;
+  line-height: 5;
+  grid-column: 2;
+}

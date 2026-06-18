@@ -2,7 +2,7 @@
 
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
 ![build](https://img.shields.io/badge/build-passing-brightgreen)
-![coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)
+![coverage](https://img.shields.io/badge/coverage-96%25-brightgreen)
 ![python](https://img.shields.io/badge/python-3.12+-yellow)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
@@ -16,10 +16,7 @@
   - [Section identification](#section-identification)
   - [.rcss basics (MVP)](#rcss-basics-mvp)
   - [Example .rcss snippets](#example-rcss-snippets)
-- [CLI: example POC commands (WIP)](#cli-example-poc-commands-wip)
-  - [Expected file formats](#expected-file-formats)
-  - [Project scope (MVP)](#project-scope-mvp)
-  - [Example project layout](#example-project-layout)
+- [Examples](#examples)
 
 ## About
 ResumeForge converts a plain UTF-8 text CV into a styled multi-page A4 PDF using a small CSS-like DSL (.rcss). Supports two layout modes: standard (single-column) and grid (2-column). MVP excludes font-face loading and decorative assets.
@@ -36,10 +33,10 @@ pip install -e .
 
 ```bash
 # Render a plain-text CV to styled PDF
-resumeforge render --input resume.txt --style resume-single.rcss --output resume.pdf
+resumeforge render --input examples/resume.txt --style examples/valid.rcss --output resume.pdf
 
 # Validate an RCSS style file for syntax errors
-resumeforge validate --style resume-single.rcss
+resumeforge validate --style examples/valid.rcss
 
 # Print CLI version
 resumeforge version
@@ -89,8 +86,38 @@ pytest
 
 ### .rcss basics (MVP)
 - File extension: .rcss
-- Supported properties: padding, margin, background-color, color, align, width (fr or fixed), gap, column-gap, font-size, line-height, display (block/inline), grid-column (1 or 2).
 - Grid mode supports exactly 2 columns. grid-column must be 1 or 2 for each section in grid mode.
+
+#### Layout properties (in `layout { ... }`)
+| Property | Values | Description |
+|---|---|---|
+| `mode` | `single`, `grid` | Page layout mode |
+| `columns` | `2` | Number of columns (grid mode) |
+| `column-gap` | e.g. `6mm` | Gap between columns |
+| `margins` | e.g. `20mm 18mm 20mm 18mm` | Page margins (top right bottom left) |
+
+#### Section properties (in `section[name="..."] { ... }`)
+
+**Style properties** (PDF render mode — applied as PDF state before writing):
+| Property | Values | Description |
+|---|---|---|
+| `font-size` | e.g. `12pt` | Text size |
+| `color` | e.g. `#333333` | Text color (hex) |
+| `background-color` | e.g. `#f0f0f0` | Section fill color (hex) |
+
+**Write properties** (PDF render mode — control how content is rendered):
+| Property | Values | Description |
+|---|---|---|
+| `align` | `left`, `center`, `right` | Text alignment |
+| `line-height` | e.g. `7` | Line height in mm |
+| `display` | `block`, `inline` | Block wraps text (multi-line), inline flows horizontally |
+
+**Layout positioning** (grid mode only):
+| Property | Values | Description |
+|---|---|---|
+| `grid-column` | `1`, `2` | Which column to place the section in |
+| `padding` | e.g. `8mm` | Inner spacing |
+| `width` | e.g. `1fr` | Proportional column width |
 
 ### Example .rcss snippets
 Single-column (resume-single.rcss)
@@ -127,70 +154,93 @@ section[name="HEADER"] {
 }
 ```
 
-## CLI: example POC commands (WIP)
-Assume binary: resumeforge
+## Examples
 
-Single-column:
-```bash
-resumeforge render --input resume.txt --style resume-single.rcss --output resume-single.pdf
+### Step 1: Write your CV as plain text (`examples/resume.txt`)
+
+```
+HEADER
+Lorem Ipsum
+Senior Software Engineer
+lorem.ipsum@fakeemail.xyz | +44 0000 000000
+
+LINKS
+github.com/loremipsum
+linkedin.com/in/loremipsum
+loremipsum.dev
+
+SKILLS
+Python, TypeScript, Go, Rust
+AWS (Lambda, DynamoDB, ECS, CDK), Terraform
+PostgreSQL, Redis, Kafka, gRPC
+
+WORK EXPERIENCE
+Senior Software Engineer - Acme Widget Corp
+Jan 2021 - Present
+- Architected event-driven microservices processing 2M+ events/day
+- Led monolith-to-ECS migration reducing deploy times by 70%
+
+EDUCATION
+MSc Computer Science - University of Nowhere, 2015
+BSc Mathematics - University of Somewhere, 2013
+
+REFERENCES
+Dolor Sit Amet
+Engineering Director, Acme Widget Corp
+dolor.sit@fakecorp.xyz
 ```
 
-Two-column grid:
-```bash
-resumeforge render --input resume.txt --style examples/valid.rcss --output resume-grid.pdf
+### Step 2: Style it with RCSS (`examples/valid.rcss`)
+
+```css
+layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
+
+section[name="HEADER"] {
+  font-size: 14pt;
+  align: center;
+  line-height: 7;
+  grid-column: 1;
+}
+
+section[name="LINKS"] {
+  font-size: 10pt;
+  color: #336699;
+  line-height: 6;
+  grid-column: 1;
+}
+
+section[name="SKILLS"] {
+  font-size: 10pt;
+  line-height: 6;
+  grid-column: 1;
+}
+
+section[name="WORK EXPERIENCE"] {
+  font-size: 10pt;
+  line-height: 6;
+  grid-column: 2;
+}
+
+section[name="EDUCATION"] {
+  font-size: 10pt;
+  line-height: 6;
+  grid-column: 2;
+}
+
+section[name="REFERENCES"] {
+  font-size: 9pt;
+  color: #666666;
+  line-height: 5;
+  grid-column: 2;
+}
 ```
 
-Validate style file:
+### Step 3: Render to PDF
+
 ```bash
-resumeforge validate --style examples/valid.rcss
+resumeforge render --input examples/resume.txt --style examples/valid.rcss --output examples/resume.pdf
 ```
 
-### Expected file formats
-- resume.txt — plain UTF-8 text with headings on their own lines (e.g., WORK EXPERIENCE).
-- *.rcss — style file using rules above.
-- Output: multi-page PDF sized to A4.
+### Result
 
-### Project scope (MVP)
-- Parse sections by heading lines, map .rcss styles, layout single or 2-column grid, paginate and render PDF.
-- No font-face loading or external assets. Only 2 columns supported in grid mode.
-
-### Example project layout
-- bin/resumeforge
-- src/{parser,layout,renderer,cli}
-- examples/{resume.txt,resume-single.rcss,resume-grid.rcss}
-- tests/{unit,visual}
-
-## Tech stack evaluation
-
-- DSL parsing
-  - Lark — easy grammar-based parser (Earley/LALR), quick AST output.
-  - ANTLR (Python target) — grammar-first, good if DSL will grow complex.
-  - parsy / parsimonious — lightweight parser-combinator options for small grammars.
-  - dataclasses / pydantic — represent and validate parsed AST/style objects.
-
-- Layout & styling engine (apply .rcss to section content)
-  - Build a layout tree (blocks, columns, paddings, margins, flow, pagination).
-  - Implement simple box model and a 2-column flow engine that respects grid-column: 1|2 and paginates to A4.
-
-- Direct PDF libraries (no HTML)
-  - ReportLab — mature, full-featured programmatic PDF generation (draw text, shapes, images, pages).
-  - fpdf2 — lightweight, Pythonic, easier API for PDFs and text layout.
-  - PyPDF2 / pikepdf — post-processing, merging, metadata, or encryption (not for layout).
-
-- Typography & measurements
-  - HarfBuzz/pyharfbuzz or use ReportLab text-wrap primitives for advanced shaping if needed later.
-  - Use mm/mm-to-point helpers and a consistent unit system for A4.
-
-- CLI & tooling
-  - Typer or Click for CLI.
-  - pytest for tests, black/isort for formatting.
-  - packaging: poetry or setuptools.
-
-- Testing & visual verification
-  - Generate small PDFs and compare rendering output (visual tests) or use heuristics on text positions.
-
-Suggested minimal stack for MVP
-- Parsing: Lark + dataclasses
-- Layout: custom box-model + simple paginator (A4 points)
-- PDF output: ReportLab (or fpdf2 if you prefer smaller lib)
-- CLI: Typer
+![Resume PDF output (truncated)](docs/resume.png)

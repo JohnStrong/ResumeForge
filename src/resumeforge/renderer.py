@@ -1,0 +1,66 @@
+"""Renders StyledSections into a paginated A4 PDF."""
+
+from dataclasses import dataclass
+from typing import Callable
+
+from resumeforge.models import LayoutRule, StyledSection, Declaration
+from resumeforge.adapters.fpdf_adapter import SectionRenderStyle
+
+# Type alias for any adapter function
+StyleAdapter = Callable[[list[Declaration]], SectionRenderStyle]
+
+
+@dataclass
+class RenderSection:
+    """A section prepared for the engine: content paired with its adapted style."""
+    name: str
+    content: str
+    style: SectionRenderStyle
+    order: int
+    grid_column: int | None = None
+
+
+# Type alias for any render engine function
+RenderEngine = Callable[[list["RenderSection"], LayoutRule, str], None]
+
+
+class Renderer:
+    """Takes styled sections and a layout rule, renders to PDF.
+
+    Adapter converts RCSS declarations into rendering instructions.
+    Engine writes the adapted sections to a specific output format.
+    """
+
+    def __init__(self, adapter: StyleAdapter, engine: RenderEngine, options: dict | None = None):
+        self._debug = options.get("debug") is True if options else False
+        self._adapter = adapter
+        self._engine = engine
+
+    def _log(self, step: str, detail: str):
+        if self._debug:
+            print(f"[renderer:{step}] {detail}")
+
+    def render(self, sections: list[StyledSection], layout: LayoutRule, output_path: str) -> None:
+        """Render styled sections to a PDF file at output_path."""
+        self._log("start", f"rendering {len(sections)} sections to {output_path}")
+        self._log("layout", f"{layout.declarations}")
+
+        render_sections = []
+        for section in sorted(sections, key=lambda s: s.order):
+            self._log("section", f"[{section.order}] {section.name}")
+            style = self._adapter(section.rule.declarations)
+            self._log("adapted", f"{style}")
+            grid_column = next(
+                (int(d.values[0]) for d in section.rule.declarations if d.property == "grid-column"),
+                None,
+            )
+            render_sections.append(RenderSection(
+                name=section.name,
+                content=section.content,
+                style=style,
+                order=section.order,
+                grid_column=grid_column,
+            ))
+
+        self._engine(render_sections, layout, output_path)
+        self._log("done", output_path)
