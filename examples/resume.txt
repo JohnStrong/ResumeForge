@@ -1,7 +1,49 @@
 HEADER
-John Smith
-john@example.com
+Lorem Ipsum
+Senior Software Engineer
+lorem.ipsum@fakeemail.xyz | +44 0000 000000
 
-EXPERIENCE
-Senior Engineer at ACME Corp
-- Built scalable microservices
+LINKS
+github.com/loremipsum
+linkedin.com/in/loremipsum
+loremipsum.dev
+
+SKILLS
+Python, TypeScript, Go, Rust
+AWS (Lambda, DynamoDB, ECS, CDK), Terraform
+PostgreSQL, Redis, Kafka, gRPC
+System Design, Distributed Systems, CI/CD
+Docker, Kubernetes, Observability
+
+WORK EXPERIENCE
+Senior Software Engineer - Acme Widget Corp
+Jan 2021 - Present
+- Architected event-driven microservices processing 2M+ events/day
+- Led monolith-to-ECS migration reducing deploy times by 70%
+- Designed real-time analytics pipeline using Kafka and Flink
+- Mentored 4 junior engineers through pairing and code review
+
+Software Engineer - Placeholder Technologies Inc
+Mar 2018 - Dec 2020
+- Built REST and gRPC APIs serving 500K daily active users
+- Implemented canary deployments reducing rollback incidents by 85%
+- Developed internal CLI tooling adopted by 3 engineering teams
+
+Software Engineer - Foobar Systems Ltd
+Sep 2015 - Feb 2018
+- Developed customer-facing dashboard using React and TypeScript
+- Designed multi-tenant SaaS schema in PostgreSQL
+- Reduced API response times by 40% through caching
+
+EDUCATION
+MSc Computer Science - University of Nowhere, 2015
+BSc Mathematics - University of Somewhere, 2013
+
+REFERENCES
+Dolor Sit Amet
+Engineering Director, Acme Widget Corp
+dolor.sit@fakecorp.xyz
+
+Consectetur Adipiscing
+CTO, Placeholder Technologies Inc
+consectetur@faketech.xyz
