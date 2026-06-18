@@ -7,6 +7,9 @@ from pathlib import Path
 from resumeforge.parser import RcssParser
 from resumeforge.transformer import transform
 from resumeforge.section_mapper import SectionMapper
+from resumeforge.renderer import Renderer
+from resumeforge.adapters.fpdf_adapter import adapt_declarations
+from resumeforge.engines.fpdf_engine import fpdf_engine
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -55,6 +58,9 @@ def cmd_render(args) -> int:
     
     # 4. Render PDF from input .txt using transformed style models
     print("[4/4] ✓ Rendering PDF")
+    Renderer(adapter=adapt_declarations, engine=fpdf_engine).render(
+        sections=styled_sections, layout=stylesheet.layout, output_path=args.output
+    )
     return 0
 
 def cmd_validate(args) -> int:
