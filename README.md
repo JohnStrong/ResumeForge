@@ -159,22 +159,21 @@ section[name="HEADER"] {
 ### Step 1: Write your CV as plain text (`examples/resume.txt`)
 
 ```
-HEADER
 Lorem Ipsum
 Senior Software Engineer
 lorem.ipsum@fakeemail.xyz | +44 0000 000000
 
-LINKS
+Links
 github.com/loremipsum
 linkedin.com/in/loremipsum
 loremipsum.dev
 
-SKILLS
+Skills
 Python, TypeScript, Go, Rust
 AWS (Lambda, DynamoDB, ECS, CDK), Terraform
 PostgreSQL, Redis, Kafka, gRPC
 
-WORK EXPERIENCE
+Work Experience
 Senior Software Engineer - Acme Widget Corp
 Jan 2021 - Present
 - Architected event-driven microservices processing 2M+ events/day
@@ -184,7 +183,7 @@ EDUCATION
 MSc Computer Science - University of Nowhere, 2015
 BSc Mathematics - University of Somewhere, 2013
 
-REFERENCES
+References
 Dolor Sit Amet
 Engineering Director, Acme Widget Corp
 dolor.sit@fakecorp.xyz
@@ -195,39 +194,39 @@ dolor.sit@fakecorp.xyz
 ```css
 layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
 
-section[name="HEADER"] {
+section[name="Lorem Ipsum"] {
   font-size: 14pt;
   align: center;
   line-height: 7;
   grid-column: 1;
 }
 
-section[name="LINKS"] {
+section[name="Links"] {
   font-size: 10pt;
   color: #336699;
   line-height: 6;
   grid-column: 1;
 }
 
-section[name="SKILLS"] {
+section[name="Skills"] {
   font-size: 10pt;
   line-height: 6;
   grid-column: 1;
 }
 
-section[name="WORK EXPERIENCE"] {
+section[name="Work Experience"] {
   font-size: 10pt;
   line-height: 6;
   grid-column: 2;
 }
 
-section[name="EDUCATION"] {
+section[name="Education"] {
   font-size: 10pt;
   line-height: 6;
   grid-column: 2;
 }
 
-section[name="REFERENCES"] {
+section[name="References"] {
   font-size: 9pt;
   color: #666666;
   line-height: 5;
@@ -243,4 +242,4 @@ resumeforge render --input examples/resume.txt --style examples/valid.rcss --out
 
 ### Result
 
-![Resume PDF output (truncated)](docs/resume.png)
+![Resume PDF output](docs/resume.png)
