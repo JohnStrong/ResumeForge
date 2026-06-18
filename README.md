@@ -89,8 +89,38 @@ pytest
 
 ### .rcss basics (MVP)
 - File extension: .rcss
-- Supported properties: padding, margin, background-color, color, align, width (fr or fixed), gap, column-gap, font-size, line-height, display (block/inline), grid-column (1 or 2).
 - Grid mode supports exactly 2 columns. grid-column must be 1 or 2 for each section in grid mode.
+
+#### Layout properties (in `layout { ... }`)
+| Property | Values | Description |
+|---|---|---|
+| `mode` | `single`, `grid` | Page layout mode |
+| `columns` | `2` | Number of columns (grid mode) |
+| `column-gap` | e.g. `6mm` | Gap between columns |
+| `margins` | e.g. `20mm 18mm 20mm 18mm` | Page margins (top right bottom left) |
+
+#### Section properties (in `section[name="..."] { ... }`)
+
+**Style properties** (PDF render mode — applied as PDF state before writing):
+| Property | Values | Description |
+|---|---|---|
+| `font-size` | e.g. `12pt` | Text size |
+| `color` | e.g. `#333333` | Text color (hex) |
+| `background-color` | e.g. `#f0f0f0` | Section fill color (hex) |
+
+**Write properties** (PDF render mode — control how content is rendered):
+| Property | Values | Description |
+|---|---|---|
+| `align` | `left`, `center`, `right` | Text alignment |
+| `line-height` | e.g. `7` | Line height in mm |
+| `display` | `block`, `inline` | Block wraps text (multi-line), inline flows horizontally |
+
+**Layout positioning** (grid mode only):
+| Property | Values | Description |
+|---|---|---|
+| `grid-column` | `1`, `2` | Which column to place the section in |
+| `padding` | e.g. `8mm` | Inner spacing |
+| `width` | e.g. `1fr` | Proportional column width |
 
 ### Example .rcss snippets
 Single-column (resume-single.rcss)
