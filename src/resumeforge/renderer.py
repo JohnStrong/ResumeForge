@@ -17,6 +17,7 @@ class RenderSection:
     content: str
     style: SectionRenderStyle
     order: int
+    grid_column: int | None = None
 
 
 # Type alias for any render engine function
@@ -49,11 +50,16 @@ class Renderer:
             self._log("section", f"[{section.order}] {section.name}")
             style = self._adapter(section.rule.declarations)
             self._log("adapted", f"{style}")
+            grid_column = next(
+                (int(d.values[0]) for d in section.rule.declarations if d.property == "grid-column"),
+                None,
+            )
             render_sections.append(RenderSection(
                 name=section.name,
                 content=section.content,
                 style=style,
                 order=section.order,
+                grid_column=grid_column,
             ))
 
         self._engine(render_sections, layout, output_path)
