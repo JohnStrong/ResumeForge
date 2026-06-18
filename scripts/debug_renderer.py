@@ -6,6 +6,7 @@ from resumeforge.transformer import transform
 from resumeforge.section_mapper import SectionMapper
 from resumeforge.renderer import Renderer
 from resumeforge.adapters.fpdf_adapter import adapt_declarations
+from resumeforge.engines.fpdf_engine import fpdf_engine
 
 EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
 
@@ -19,5 +20,5 @@ cv_text = (EXAMPLES_DIR / "resume.txt").read_text()
 styled_sections = SectionMapper().map(cv_text, stylesheet)
 
 # Render with adapter
-renderer = Renderer(adapter=adapt_declarations, options={"debug": True})
+renderer = Renderer(adapter=adapt_declarations, engine=fpdf_engine, options={"debug": True})
 renderer.render(sections=styled_sections, layout=stylesheet.layout, output_path="output.pdf")

@@ -7,7 +7,7 @@ from resumeforge.models import (
     Declaration, LayoutRule, SectionRule, StyledSection,
 )
 from resumeforge.adapters.fpdf_adapter import SectionRenderStyle, DisplayMode
-from resumeforge.renderer import Renderer
+from resumeforge.renderer import Renderer, RenderSection
 
 
 @pytest.fixture
@@ -16,6 +16,11 @@ def layout():
         Declaration(property="mode", values=["grid"]),
         Declaration(property="columns", values=["2"]),
     ])
+
+
+@pytest.fixture
+def noop_engine():
+    return MagicMock()
 
 
 def _make_section(name, declarations, order=0):
@@ -30,18 +35,18 @@ def _make_section(name, declarations, order=0):
 class TestRendererPositive:
     """POSITIVE: renderer invokes adapter correctly for each section."""
 
-    def test_adapter_called_per_section(self, layout):
+    def test_adapter_called_per_section(self, layout, noop_engine):
         """POSITIVE: adapter is called once per styled section."""
         adapter = MagicMock(return_value=SectionRenderStyle())
         sections = [
             _make_section("HEADER", [Declaration(property="align", values=["center"])], order=0),
             _make_section("EXPERIENCE", [Declaration(property="font-size", values=["12pt"])], order=1),
         ]
-        renderer = Renderer(adapter=adapter)
+        renderer = Renderer(adapter=adapter, engine=noop_engine)
         renderer.render(sections=sections, layout=layout, output_path="out.pdf")
         assert adapter.call_count == 2
 
-    def test_adapter_receives_correct_declarations(self, layout):
+    def test_adapter_receives_correct_declarations(self, layout, noop_engine):
         """POSITIVE: adapter receives the declarations from each section's rule."""
         adapter = MagicMock(return_value=SectionRenderStyle())
         decls_header = [Declaration(property="align", values=["center"])]
@@ -50,12 +55,12 @@ class TestRendererPositive:
             _make_section("HEADER", decls_header, order=0),
             _make_section("EXPERIENCE", decls_exp, order=1),
         ]
-        renderer = Renderer(adapter=adapter)
+        renderer = Renderer(adapter=adapter, engine=noop_engine)
         renderer.render(sections=sections, layout=layout, output_path="out.pdf")
         adapter.assert_any_call(decls_header)
         adapter.assert_any_call(decls_exp)
 
-    def test_adapter_called_in_section_order(self, layout):
+    def test_adapter_called_in_section_order(self, layout, noop_engine):
         """POSITIVE: adapter processes sections sorted by order field, not list position."""
         calls = []
         def tracking_adapter(decls):
@@ -68,27 +73,36 @@ class TestRendererPositive:
             _make_section("EXPERIENCE", decls_b, order=1),
             _make_section("HEADER", decls_a, order=0),
         ]
-        renderer = Renderer(adapter=tracking_adapter)
+        renderer = Renderer(adapter=tracking_adapter, engine=noop_engine)
         renderer.render(sections=sections, layout=layout, output_path="out.pdf")
         assert calls == [decls_a, decls_b]
 
-    def test_empty_sections_no_adapter_call(self, layout):
+    def test_empty_sections_no_adapter_call(self, layout, noop_engine):
         """POSITIVE: no adapter calls when sections list is empty."""
         adapter = MagicMock(return_value=SectionRenderStyle())
-        renderer = Renderer(adapter=adapter)
+        renderer = Renderer(adapter=adapter, engine=noop_engine)
         renderer.render(sections=[], layout=layout, output_path="out.pdf")
         adapter.assert_not_called()
+
+    def test_engine_is_called(self, layout, noop_engine):
+        """POSITIVE: engine is invoked once per render call."""
+        adapter = MagicMock(return_value=SectionRenderStyle())
+        sections = [_make_section("HEADER", [Declaration(property="align", values=["center"])], order=0)]
+        renderer = Renderer(adapter=adapter, engine=noop_engine)
+        renderer.render(sections=sections, layout=layout, output_path="out.pdf")
+        noop_engine.assert_called_once()
 
 
 class TestRendererNegative:
     """NEGATIVE: renderer handles adapter errors."""
 
-    def test_adapter_exception_propagates(self, layout):
-        """NEGATIVE: if adapter raises, renderer does not swallow the error."""
+    def test_engine_not_called_when_adapter_fails(self, layout, noop_engine):
+        """NEGATIVE: engine is not invoked if the adapter raises an error."""
         def failing_adapter(decls):
             raise ValueError("unsupported property")
 
         sections = [_make_section("HEADER", [Declaration(property="bad", values=["x"])])]
-        renderer = Renderer(adapter=failing_adapter)
-        with pytest.raises(ValueError, match="unsupported property"):
+        renderer = Renderer(adapter=failing_adapter, engine=noop_engine)
+        with pytest.raises(ValueError):
             renderer.render(sections=sections, layout=layout, output_path="out.pdf")
+        noop_engine.assert_not_called()

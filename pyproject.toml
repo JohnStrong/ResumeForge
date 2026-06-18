@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Convert plain-text CVs into styled A4 PDFs using RCSS"
 requires-python = ">=3.10"
 license = {text = "MIT"}
-dependencies = ["lark"]
+dependencies = ["lark", "fpdf2"]
 
 [project.scripts]
 resumeforge = "resumeforge.cli:main"

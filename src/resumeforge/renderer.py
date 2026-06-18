@@ -1,18 +1,39 @@
 """Renders StyledSections into a paginated A4 PDF."""
 
+from dataclasses import dataclass
 from typing import Callable
-from resumeforge.models import LayoutRule, StyledSection, Declaration
-from resumeforge.adapters.fpdf_adapter import adapt_declarations, SectionRenderStyle
 
- # Type alias for any adapter function
+from resumeforge.models import LayoutRule, StyledSection, Declaration
+from resumeforge.adapters.fpdf_adapter import SectionRenderStyle
+
+# Type alias for any adapter function
 StyleAdapter = Callable[[list[Declaration]], SectionRenderStyle]
 
-class Renderer:
-    """Takes styled sections and a layout rule, renders to PDF."""
 
-    def __init__(self, adapter: StyleAdapter, options: dict | None = None):
+@dataclass
+class RenderSection:
+    """A section prepared for the engine: content paired with its adapted style."""
+    name: str
+    content: str
+    style: SectionRenderStyle
+    order: int
+
+
+# Type alias for any render engine function
+RenderEngine = Callable[[list["RenderSection"], LayoutRule, str], None]
+
+
+class Renderer:
+    """Takes styled sections and a layout rule, renders to PDF.
+
+    Adapter converts RCSS declarations into rendering instructions.
+    Engine writes the adapted sections to a specific output format.
+    """
+
+    def __init__(self, adapter: StyleAdapter, engine: RenderEngine, options: dict | None = None):
         self._debug = options.get("debug") is True if options else False
-        self.adapter = adapter
+        self._adapter = adapter
+        self._engine = engine
 
     def _log(self, step: str, detail: str):
         if self._debug:
@@ -23,10 +44,17 @@ class Renderer:
         self._log("start", f"rendering {len(sections)} sections to {output_path}")
         self._log("layout", f"{layout.declarations}")
 
+        render_sections = []
         for section in sorted(sections, key=lambda s: s.order):
             self._log("section", f"[{section.order}] {section.name}")
-            adatped_section = self.adapter(section.rule.declarations)
-            self._log("adapted_section", f"[{adatped_section}]")
+            style = self._adapter(section.rule.declarations)
+            self._log("adapted", f"{style}")
+            render_sections.append(RenderSection(
+                name=section.name,
+                content=section.content,
+                style=style,
+                order=section.order,
+            ))
 
-        # TODO: implement layout engine + PDF generation
+        self._engine(render_sections, layout, output_path)
         self._log("done", output_path)
