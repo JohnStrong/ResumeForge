@@ -6,6 +6,8 @@
 ![python](https://img.shields.io/badge/python-3.12+-yellow)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
+> 🌐 **Website:** https://resume-forge-cli.web.app/
+
 ## Table of Contents
 - [About](#about)
 - [Setup](#setup)
