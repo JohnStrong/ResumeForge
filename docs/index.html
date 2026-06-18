@@ -140,6 +140,7 @@
                         </ul>
                     </li>
                     <li><a href="#rcss-dsl">RCSS DSL</a></li>
+                    <li><a href="#showcase">Showcase</a></li>
                     <li><a href="#troubleshooting">Troubleshooting</a></li>
                 </ul>
             </details>
@@ -213,6 +214,86 @@ pip install -e .</code></pre>
 
 section[name="HEADER"] { grid-column: 1; padding: 8mm; align: center; }
 section[name="EXPERIENCE"] { grid-column: 2; padding: 6mm; font-size: 12pt; }</code></pre>
+
+            <h2 id="showcase">Showcase</h2>
+
+            <h3>1. Write your CV as plain text</h3>
+            <pre><code>Lorem Ipsum
+Senior Software Engineer
+lorem.ipsum@fakeemail.xyz | +44 0000 000000
+
+Links
+github.com/loremipsum
+linkedin.com/in/loremipsum
+loremipsum.dev
+
+Skills
+Python, TypeScript, Go, Rust
+AWS (Lambda, DynamoDB, ECS, CDK), Terraform
+PostgreSQL, Redis, Kafka, gRPC
+
+Work Experience
+Senior Software Engineer - Acme Widget Corp
+Jan 2021 - Present
+- Architected event-driven microservices processing 2M+ events/day
+- Led monolith-to-ECS migration reducing deploy times by 70%
+
+Education
+MSc Computer Science - University of Nowhere, 2015
+BSc Mathematics - University of Somewhere, 2013
+
+References
+Dolor Sit Amet
+Engineering Director, Acme Widget Corp
+dolor.sit@fakecorp.xyz</code></pre>
+
+            <h3>2. Style it with RCSS</h3>
+            <pre><code>layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
+
+section[name="Lorem Ipsum"] {
+  font-size: 14pt;
+  align: center;
+  line-height: 7;
+  grid-column: 1;
+}
+
+section[name="Links"] {
+  font-size: 10pt;
+  color: #336699;
+  line-height: 6;
+  grid-column: 1;
+}
+
+section[name="Skills"] {
+  font-size: 10pt;
+  line-height: 6;
+  grid-column: 1;
+}
+
+section[name="Work Experience"] {
+  font-size: 10pt;
+  line-height: 6;
+  grid-column: 2;
+}
+
+section[name="Education"] {
+  font-size: 10pt;
+  line-height: 6;
+  grid-column: 2;
+}
+
+section[name="References"] {
+  font-size: 9pt;
+  color: #666666;
+  line-height: 5;
+  grid-column: 2;
+}</code></pre>
+
+            <h3>3. Render to PDF</h3>
+            <pre><code>resumeforge render --input examples/resume.txt --style examples/valid.rcss --output examples/resume.pdf</code></pre>
+
+            <h3>Result</h3>
+            <img src="resume.png" alt="Resume PDF output" style="max-width:100%; border:1px solid var(--border); border-radius:4px;">
 
             <h2 id="troubleshooting">Troubleshooting</h2>
 

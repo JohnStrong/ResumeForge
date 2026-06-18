@@ -53,16 +53,25 @@ def _render_grid(pdf: FPDF, sections: list[RenderSection], layout: LayoutRule) -
     for section in sections:
         col = (section.grid_column or 1) - 1  # 0-indexed
         pdf.set_xy(col_x[col], col_y[col])
-        _apply_and_write(pdf, section, w=col_w)
+        _apply_and_write(pdf, section, w=col_w, x_after=col_x[col])
         col_y[col] = pdf.get_y()
 
 
-def _apply_and_write(pdf: FPDF, section: RenderSection, w: float) -> None:
-    """Apply state setters and write section content."""
+def _apply_and_write(pdf: FPDF, section: RenderSection, w: float, x_after: float | None = None) -> None:
+    """Apply state setters, write heading in bold, then write section content."""
+    new_x = "LEFT" if x_after is not None else "LMARGIN"
+
     for setter in section.style.state_setters:
         setter(pdf)
 
+    # Write section heading in bold
+    current_size = pdf.font_size_pt
+    pdf.set_font("Helvetica", style="B", size=current_size)
+    pdf.multi_cell(w=w, text=section.name, new_x=new_x, new_y="NEXT")
+    pdf.set_font("Helvetica", style="", size=current_size)
+
+    # Write section content
     if section.style.display == DisplayMode.BLOCK:
-        pdf.multi_cell(w=w, text=section.content, new_x="LMARGIN", new_y="NEXT", **section.style.write_params)
+        pdf.multi_cell(w=w, text=section.content, new_x=new_x, new_y="NEXT", **section.style.write_params)
     else:
         pdf.cell(w=w, text=section.content, **section.style.write_params)

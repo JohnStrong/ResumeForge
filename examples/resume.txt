@@ -1,21 +1,20 @@
-HEADER
 Lorem Ipsum
 Senior Software Engineer
 lorem.ipsum@fakeemail.xyz | +44 0000 000000
 
-LINKS
+Links
 github.com/loremipsum
 linkedin.com/in/loremipsum
 loremipsum.dev
 
-SKILLS
+Skills
 Python, TypeScript, Go, Rust
 AWS (Lambda, DynamoDB, ECS, CDK), Terraform
 PostgreSQL, Redis, Kafka, gRPC
 System Design, Distributed Systems, CI/CD
 Docker, Kubernetes, Observability
 
-WORK EXPERIENCE
+Work Experience
 Senior Software Engineer - Acme Widget Corp
 Jan 2021 - Present
 - Architected event-driven microservices processing 2M+ events/day
@@ -35,11 +34,11 @@ Sep 2015 - Feb 2018
 - Designed multi-tenant SaaS schema in PostgreSQL
 - Reduced API response times by 40% through caching
 
-EDUCATION
+Education
 MSc Computer Science - University of Nowhere, 2015
 BSc Mathematics - University of Somewhere, 2013
 
-REFERENCES
+References
 Dolor Sit Amet
 Engineering Director, Acme Widget Corp
 dolor.sit@fakecorp.xyz
