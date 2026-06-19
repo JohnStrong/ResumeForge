@@ -1,5 +1,4 @@
-@font-face { font-family: "Carlito"; src: "examples/fonts/Carlito-Regular.ttf"; }
-@font-face { font-family: "Carlito"; src: "examples/fonts/Carlito-Bold.ttf"; font-weight: bold; }
+@font-face { font-family: "Carlito"; src: "examples/fonts/Carlito-Regular.ttf"; src-bold: "examples/fonts/Carlito-Bold.ttf"; }
 
 layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
 

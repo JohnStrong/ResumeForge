@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Callable
 
-from resumeforge.models import LayoutRule, StyledSection, Declaration
+from resumeforge.models import FontFaceRule, LayoutRule, StyledSection, Declaration
 from resumeforge.adapters.fpdf_adapter import SectionRenderStyle
 
 # Type alias for any adapter function
@@ -40,7 +40,7 @@ class Renderer:
         if self._debug:
             print(f"[renderer:{step}] {detail}")
 
-    def render(self, sections: list[StyledSection], layout: LayoutRule, output_path: str) -> None:
+    def render(self, sections: list[StyledSection], layout: LayoutRule, output_path: str, font_face: FontFaceRule | None = None) -> None:
         """Render styled sections to a PDF file at output_path."""
         self._log("start", f"rendering {len(sections)} sections to {output_path}")
         self._log("layout", f"{layout.declarations}")
@@ -62,5 +62,5 @@ class Renderer:
                 grid_column=grid_column,
             ))
 
-        self._engine(render_sections, layout, output_path)
+        self._engine(render_sections, layout, output_path, font_face=font_face)
         self._log("done", output_path)
