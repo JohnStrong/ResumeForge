@@ -172,10 +172,19 @@ pip install -e .</code></pre>
             <pre><code>resumeforge version</code></pre>
 
             <h2 id="rcss-dsl">RCSS DSL</h2>
-            <p>RCSS is a minimal CSS-like language with two selector types:</p>
+            <p>RCSS is a minimal CSS-like language with three selector types:</p>
             <ul>
-                <li><code>layout { ... }</code> — page-level settings (mode, columns, margins)</li>
+                <li><code>@font-face { ... }</code> — custom font registration (optional)</li>
+                <li><code>layout { ... }</code> — page-level settings (mode, columns, margins, font)</li>
                 <li><code>section[name="HEADING"] { ... }</code> — per-section styles matched by heading text</li>
+            </ul>
+
+            <h3>Font face properties</h3>
+            <p>Used inside <code>@font-face { ... }</code> (optional — falls back to Helvetica):</p>
+            <ul>
+                <li><code>font-family</code> — font family name to register (e.g. <code>"Carlito"</code>)</li>
+                <li><code>src</code> — path to regular weight TTF (e.g. <code>"fonts/Carlito-Regular.ttf"</code>)</li>
+                <li><code>src-bold</code> — path to bold weight TTF (e.g. <code>"fonts/Carlito-Bold.ttf"</code>)</li>
             </ul>
 
             <h3>Layout properties</h3>
@@ -185,6 +194,7 @@ pip install -e .</code></pre>
                 <li><code>columns</code> — number of columns (grid mode, currently <code>2</code>)</li>
                 <li><code>column-gap</code> — gap between columns (e.g. <code>6mm</code>)</li>
                 <li><code>margins</code> — page margins: top right bottom left (e.g. <code>20mm 18mm 20mm 18mm</code>)</li>
+                <li><code>font-family</code> — default font family (e.g. <code>"Helvetica"</code>)</li>
             </ul>
 
             <h3>Section style properties</h3>
@@ -248,7 +258,9 @@ Engineering Director, Acme Widget Corp
 dolor.sit@fakecorp.xyz</code></pre>
 
             <h3>2. Style it with RCSS</h3>
-            <pre><code>layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
+            <pre><code>@font-face { font-family: "Carlito"; src: "examples/fonts/Carlito-Regular.ttf"; src-bold: "examples/fonts/Carlito-Bold.ttf"; }
+
+layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
 
 section[name="Lorem Ipsum"] {
   font-size: 14pt;
