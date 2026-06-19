@@ -182,14 +182,30 @@ Skills
 Python, TypeScript, Go, Rust
 AWS (Lambda, DynamoDB, ECS, CDK), Terraform
 PostgreSQL, Redis, Kafka, gRPC
+System Design, Distributed Systems, CI/CD
+Docker, Kubernetes, Observability
 
 Work Experience
 Senior Software Engineer - Acme Widget Corp
 Jan 2021 - Present
 - Architected event-driven microservices processing 2M+ events/day
 - Led monolith-to-ECS migration reducing deploy times by 70%
+- Designed real-time analytics pipeline using Kafka and Flink
+- Mentored 4 junior engineers through pairing and code review
 
-EDUCATION
+Software Engineer - Placeholder Technologies Inc
+Mar 2018 - Dec 2020
+- Built REST and gRPC APIs serving 500K daily active users
+- Implemented canary deployments reducing rollback incidents by 85%
+- Developed internal CLI tooling adopted by 3 engineering teams
+
+Software Engineer - Foobar Systems Ltd
+Sep 2015 - Feb 2018
+- Developed customer-facing dashboard using React and TypeScript
+- Designed multi-tenant SaaS schema in PostgreSQL
+- Reduced API response times by 40% through caching
+
+Education
 MSc Computer Science - University of Nowhere, 2015
 BSc Mathematics - University of Somewhere, 2013
 
@@ -197,6 +213,10 @@ References
 Dolor Sit Amet
 Engineering Director, Acme Widget Corp
 dolor.sit@fakecorp.xyz
+
+Consectetur Adipiscing
+CTO, Placeholder Technologies Inc
+consectetur@faketech.xyz
 ```
 
 ### Step 2: Style it with RCSS (`examples/valid.rcss`)
@@ -207,40 +227,35 @@ dolor.sit@fakecorp.xyz
 layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
 
 section[name="Lorem Ipsum"] {
-  font-size: 14pt;
+  font-size: 22pt;
   align: center;
-  line-height: 7;
+  line-height: 9;
   grid-column: 1;
 }
 
 section[name="Links"] {
-  font-size: 10pt;
   color: #336699;
-  line-height: 6;
+  line-height: 5;
   grid-column: 1;
 }
 
 section[name="Skills"] {
-  font-size: 10pt;
-  line-height: 6;
+  line-height: 5;
   grid-column: 1;
 }
 
 section[name="Work Experience"] {
-  font-size: 10pt;
-  line-height: 6;
+  line-height: 5;
   grid-column: 2;
 }
 
 section[name="Education"] {
-  font-size: 10pt;
-  line-height: 6;
+  line-height: 5;
   grid-column: 2;
 }
 
 section[name="References"] {
-  font-size: 9pt;
-  color: #666666;
+  color: #555555;
   line-height: 5;
   grid-column: 2;
 }

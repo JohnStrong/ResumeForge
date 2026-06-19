@@ -92,6 +92,10 @@ def _apply_and_write(pdf: FPDF, section: RenderSection, w: float, font_family: s
     """Apply state setters, write heading in bold, then write section content."""
     new_x = "LEFT" if x_after is not None else "LMARGIN"
 
+    # Reset state to defaults before applying section overrides
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font_size(DEFAULTS["body-font-size"])
+
     # Apply section-level style overrides (font-size, color, etc.)
     for setter in section.style.state_setters:
         setter(pdf)
