@@ -1,39 +1,43 @@
-layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
+@font-face { font-family: "Carlito"; src: "examples/fonts/Carlito-Regular.ttf"; }
+@font-face { font-family: "Carlito"; src: "examples/fonts/Carlito-Bold.ttf"; font-weight: bold; }
+
+layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
 
 section[name="Lorem Ipsum"] {
-  font-size: 14pt;
-  line-height: 7;
+  font-size: 22pt;
+  align: center;
+  line-height: 9;
   grid-column: 1;
 }
 
 section[name="Links"] {
   font-size: 10pt;
   color: #336699;
-  line-height: 6;
+  line-height: 5;
   grid-column: 1;
 }
 
 section[name="Skills"] {
-  font-size: 10pt;
-  line-height: 6;
+  font-size: 11pt;
+  line-height: 5;
   grid-column: 1;
 }
 
 section[name="Work Experience"] {
-  font-size: 10pt;
-  line-height: 6;
+  font-size: 11pt;
+  line-height: 5;
   grid-column: 2;
 }
 
 section[name="Education"] {
-  font-size: 10pt;
-  line-height: 6;
+  font-size: 11pt;
+  line-height: 5;
   grid-column: 2;
 }
 
 section[name="References"] {
-  font-size: 9pt;
-  color: #666666;
+  font-size: 10pt;
+  color: #555555;
   line-height: 5;
   grid-column: 2;
 }
