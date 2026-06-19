@@ -48,6 +48,8 @@ Example output:
 from resumeforge.parser import RcssParser
 
 MOCK_RCSS = """\
+@font-face { font-family: "Consolas"; src: "./fonts/Consolas.ttf"; font-weight: bold; }
+
 layout {
     mode: grid;
     columns: 2;

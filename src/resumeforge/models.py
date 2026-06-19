@@ -40,12 +40,18 @@ class SectionRule:
     """A section[name="..."] { ... } block — per-section styles"""
     name: str  # the heading text, e.g. "HEADER", "WORK EXPERIENCE"
     declarations: list[Declaration]
+
+@dataclass
+class FontFaceRule:
+    """A @font-face block"""
+    declarations: list[Declaration]
   
 @dataclass
 class Stylesheet:
     """The complete parsed .rcss file as domain objects"""
     layout: LayoutRule # required — every .rcss must have a layout block
-    sections: list[SectionRule]
+    sections: list[SectionRule] # required - every .rcss must have 1..N section blocks
+    font_face: FontFaceRule | None = None # optional - falls-back to default font
 
 @dataclass
 class StyledSection:

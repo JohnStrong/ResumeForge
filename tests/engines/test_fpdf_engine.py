@@ -19,12 +19,13 @@ def layout():
     ])
 
 
-def _section(name, content, style=None, order=0):
+def _section(name, content, style=None, order=0, grid_column=None):
     return RenderSection(
         name=name,
         content=content,
         style=style or SectionRenderStyle(),
         order=order,
+        grid_column=grid_column,
     )
 
 
@@ -139,3 +140,27 @@ class TestFpdfEngineE2E:
         # Verify content is rendered
         assert "Jane Doe" in page_text
         assert "Software Engineer at ACME" in page_text
+
+    def test_grid_layout_renders_both_columns(self, tmp_path):
+        """POSITIVE: grid mode renders sections in separate columns."""
+        from pypdf import PdfReader
+
+        grid_layout = LayoutRule(declarations=[
+            Declaration(property="mode", values=["grid"]),
+            Declaration(property="columns", values=["2"]),
+            Declaration(property="column-gap", values=["6mm"]),
+        ])
+        output = str(tmp_path / "grid_output.pdf")
+        sections = [
+            _section("SKILLS", "Python\nTypeScript", order=0, grid_column=1),
+            _section("EXPERIENCE", "Engineer at Acme", order=1, grid_column=2),
+        ]
+        fpdf_engine(sections, grid_layout, output)
+
+        assert os.path.exists(output)
+        reader = PdfReader(output)
+        page_text = reader.pages[0].extract_text()
+        assert "SKILLS" in page_text
+        assert "Python" in page_text
+        assert "EXPERIENCE" in page_text
+        assert "Engineer at Acme" in page_text

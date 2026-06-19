@@ -170,3 +170,96 @@ section[name="MAIN"] { grid-column: 2; padding: 6mm; }
         result = parser.parse(rcss)
         with pytest.raises(VisitError, match="layout"):
             transform(result.tree)
+
+
+class TestFontFaceSelector:
+    """Tests for fontface_selector() method."""
+
+    def test_returns_font_face_string(self, transformer):
+        """POSITIVE: fontface_selector returns 'font-face' identifier"""
+        result = transformer.fontface_selector([])
+        assert result == "font-face"
+
+
+class TestFontFaceRule:
+    """Tests for rule() handling @font-face."""
+
+    def test_font_face_rule_created(self, transformer):
+        """POSITIVE: selector 'font-face' with declarations produces FontFaceRule"""
+        from resumeforge.models import FontFaceRule
+        items = [
+            "font-face",
+            Declaration(property="font-family", values=['"Consolas"']),
+            Declaration(property="src", values=['"./fonts/Consolas.ttf"']),
+        ]
+        result = transformer.rule(items)
+        assert isinstance(result, FontFaceRule)
+        assert len(result.declarations) == 2
+
+    def test_font_face_rule_with_weight(self, transformer):
+        """POSITIVE: @font-face with font-weight captures all declarations"""
+        from resumeforge.models import FontFaceRule
+        items = [
+            "font-face",
+            Declaration(property="font-family", values=['"Consolas"']),
+            Declaration(property="src", values=['"./fonts/Consolas-Bold.ttf"']),
+            Declaration(property="font-weight", values=["bold"]),
+        ]
+        result = transformer.rule(items)
+        assert isinstance(result, FontFaceRule)
+        assert len(result.declarations) == 3
+
+
+class TestStartWithFontFace:
+    """Tests for start() with @font-face rules."""
+
+    def test_font_face_set_in_stylesheet(self, transformer):
+        """POSITIVE: @font-face rule is set as font_face on Stylesheet"""
+        from resumeforge.models import FontFaceRule
+        items = [
+            FontFaceRule(declarations=[Declaration(property="font-family", values=['"Consolas"'])]),
+            LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
+        ]
+        result = transformer.start(items)
+        assert result.font_face is not None
+        assert isinstance(result.font_face, FontFaceRule)
+        assert result.font_face.declarations[0].values == ['"Consolas"']
+
+    def test_no_font_face_defaults_to_none(self, transformer):
+        """POSITIVE: stylesheet without @font-face has font_face=None"""
+        items = [
+            LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
+        ]
+        result = transformer.start(items)
+        assert result.font_face is None
+
+
+class TestFontFaceIntegration:
+    """Integration tests for @font-face parsing and transformation."""
+
+    def test_full_transform_with_font_face(self, parser):
+        """POSITIVE: RCSS with @font-face transforms into Stylesheet with font_face set"""
+        rcss = '''\
+@font-face { font-family: "Consolas"; src: "./fonts/Consolas.ttf"; font-weight: bold; }
+layout { mode: single; }
+section[name="HEADER"] { font-size: 12pt; }
+'''
+        result = parser.parse(rcss)
+        stylesheet = transform(result.tree)
+        assert stylesheet.font_face is not None
+        decls = {d.property: d.values[0] for d in stylesheet.font_face.declarations}
+        assert decls["font-family"] == '"Consolas"'
+        assert decls["src"] == '"./fonts/Consolas.ttf"'
+        assert decls["font-weight"] == "bold"
+
+    def test_full_transform_without_font_face(self, parser):
+        """POSITIVE: RCSS without @font-face has font_face=None"""
+        rcss = '''\
+layout { mode: single; }
+section[name="HEADER"] { font-size: 12pt; }
+'''
+        result = parser.parse(rcss)
+        stylesheet = transform(result.tree)
+        assert stylesheet.font_face is None
