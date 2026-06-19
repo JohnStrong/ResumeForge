@@ -95,6 +95,7 @@ pytest
 |---|---|---|
 | `mode` | `single`, `grid` | Page layout mode |
 | `columns` | `2` | Number of columns (grid mode) |
+| `column-widths` | e.g. `35% 65%` | Width of each column as percentages (grid mode, must sum to 100%) |
 | `column-gap` | e.g. `6mm` | Gap between columns |
 | `margins` | e.g. `20mm 18mm 20mm 18mm` | Page margins (top right bottom left) |
 | `font-family` | e.g. `"Helvetica"` | Default font (overridden by @font-face) |
@@ -142,7 +143,7 @@ section[name="HEADER"] {
 
 Two-column grid (resume-grid.rcss)
 ```css
-layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
+layout { mode: grid; columns: 2; column-widths: 35% 65%; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
 
 /* Place by heading text and explicit column (1 or 2) */
 section[name="SIDEBAR"] {
@@ -224,7 +225,7 @@ consectetur@faketech.xyz
 ```css
 @font-face { font-family: "Carlito"; src: "examples/fonts/Carlito-Regular.ttf"; src-bold: "examples/fonts/Carlito-Bold.ttf"; }
 
-layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
+layout { mode: grid; columns: 2; column-widths: 35% 65%; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
 
 section[name="Lorem Ipsum"] {
   font-size: 22pt;
