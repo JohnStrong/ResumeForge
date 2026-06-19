@@ -92,6 +92,17 @@ class TestRendererPositive:
         renderer.render(sections=sections, layout=layout, output_path="out.pdf")
         noop_engine.assert_called_once()
 
+    def test_font_face_passed_to_engine(self, layout, noop_engine):
+        """POSITIVE: font_face is forwarded to the engine."""
+        from resumeforge.models import FontFaceRule
+        adapter = MagicMock(return_value=SectionRenderStyle())
+        font_face = FontFaceRule(declarations=[Declaration(property="font-family", values=['"Carlito"'])])
+        sections = [_make_section("HEADER", [Declaration(property="align", values=["center"])], order=0)]
+        renderer = Renderer(adapter=adapter, engine=noop_engine)
+        renderer.render(sections=sections, layout=layout, output_path="out.pdf", font_face=font_face)
+        _, kwargs = noop_engine.call_args
+        assert kwargs["font_face"] == font_face
+
 
 class TestRendererNegative:
     """NEGATIVE: renderer handles adapter errors."""

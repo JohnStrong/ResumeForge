@@ -19,12 +19,13 @@ def layout():
     ])
 
 
-def _section(name, content, style=None, order=0):
+def _section(name, content, style=None, order=0, grid_column=None):
     return RenderSection(
         name=name,
         content=content,
         style=style or SectionRenderStyle(),
         order=order,
+        grid_column=grid_column,
     )
 
 
@@ -37,7 +38,7 @@ class TestFpdfEnginePositive:
         pdf = MockFPDF.return_value
         fpdf_engine([], layout, "out.pdf")
         pdf.add_page.assert_called_once()
-        pdf.set_font.assert_called_once_with("Helvetica", size=10)
+        pdf.set_font.assert_any_call("Helvetica", size=11)
 
     @patch("resumeforge.engines.fpdf_engine.FPDF")
     def test_block_section_uses_multi_cell(self, MockFPDF, layout):
@@ -61,7 +62,7 @@ class TestFpdfEnginePositive:
         style = SectionRenderStyle(display=DisplayMode.INLINE)
         sections = [_section("LINKS", "github.com/jsmith", style)]
         fpdf_engine(sections, layout, "out.pdf")
-        pdf.cell.assert_called_once_with(w=0, text="github.com/jsmith")
+        pdf.cell.assert_called_once_with(w=0, text="github.com/jsmith", h=5)
 
     @patch("resumeforge.engines.fpdf_engine.FPDF")
     def test_state_setters_applied_before_write(self, MockFPDF, layout):
@@ -139,3 +140,93 @@ class TestFpdfEngineE2E:
         # Verify content is rendered
         assert "Jane Doe" in page_text
         assert "Software Engineer at ACME" in page_text
+
+    def test_grid_layout_renders_both_columns(self, tmp_path):
+        """POSITIVE: grid mode renders sections in separate columns."""
+        from pypdf import PdfReader
+
+        grid_layout = LayoutRule(declarations=[
+            Declaration(property="mode", values=["grid"]),
+            Declaration(property="columns", values=["2"]),
+            Declaration(property="column-gap", values=["6mm"]),
+        ])
+        output = str(tmp_path / "grid_output.pdf")
+        sections = [
+            _section("SKILLS", "Python\nTypeScript", order=0, grid_column=1),
+            _section("EXPERIENCE", "Engineer at Acme", order=1, grid_column=2),
+        ]
+        fpdf_engine(sections, grid_layout, output)
+
+        assert os.path.exists(output)
+        reader = PdfReader(output)
+        page_text = reader.pages[0].extract_text()
+        assert "SKILLS" in page_text
+        assert "Python" in page_text
+        assert "EXPERIENCE" in page_text
+        assert "Engineer at Acme" in page_text
+
+
+class TestFpdfEngineFonts:
+    """Tests for font registration and usage in fpdf_engine."""
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_no_font_face_uses_default_helvetica(self, MockFPDF, layout):
+        """POSITIVE: without @font-face, engine uses Helvetica as default."""
+        pdf = MockFPDF.return_value
+        fpdf_engine([], layout, "out.pdf", font_face=None)
+        pdf.add_font.assert_not_called()
+        pdf.set_font.assert_any_call("Helvetica", size=11)
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_font_face_registers_regular(self, MockFPDF, layout):
+        """POSITIVE: @font-face with src registers the regular variant."""
+        from resumeforge.models import FontFaceRule
+        pdf = MockFPDF.return_value
+        font_face = FontFaceRule(declarations=[
+            Declaration(property="font-family", values=['"Carlito"']),
+            Declaration(property="src", values=['"fonts/Carlito-Regular.ttf"']),
+        ])
+        fpdf_engine([], layout, "out.pdf", font_face=font_face)
+        pdf.add_font.assert_any_call("Carlito", "", "fonts/Carlito-Regular.ttf")
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_font_face_registers_bold(self, MockFPDF, layout):
+        """POSITIVE: @font-face with src-bold registers the bold variant."""
+        from resumeforge.models import FontFaceRule
+        pdf = MockFPDF.return_value
+        font_face = FontFaceRule(declarations=[
+            Declaration(property="font-family", values=['"Carlito"']),
+            Declaration(property="src", values=['"fonts/Carlito-Regular.ttf"']),
+            Declaration(property="src-bold", values=['"fonts/Carlito-Bold.ttf"']),
+        ])
+        fpdf_engine([], layout, "out.pdf", font_face=font_face)
+        pdf.add_font.assert_any_call("Carlito", "", "fonts/Carlito-Regular.ttf")
+        pdf.add_font.assert_any_call("Carlito", "B", "fonts/Carlito-Bold.ttf")
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_font_face_sets_registered_font(self, MockFPDF, layout):
+        """POSITIVE: engine uses the registered font family for set_font."""
+        from resumeforge.models import FontFaceRule
+        pdf = MockFPDF.return_value
+        font_face = FontFaceRule(declarations=[
+            Declaration(property="font-family", values=['"Carlito"']),
+            Declaration(property="src", values=['"fonts/Carlito-Regular.ttf"']),
+        ])
+        fpdf_engine([], layout, "out.pdf", font_face=font_face)
+        pdf.set_font.assert_any_call("Carlito", size=11)
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_uses_bold_of_registered_font(self, MockFPDF, layout):
+        """POSITIVE: section headings use bold style of the registered font."""
+        from resumeforge.models import FontFaceRule
+        pdf = MockFPDF.return_value
+        pdf.font_size_pt = 11
+        font_face = FontFaceRule(declarations=[
+            Declaration(property="font-family", values=['"Carlito"']),
+            Declaration(property="src", values=['"fonts/Carlito-Regular.ttf"']),
+            Declaration(property="src-bold", values=['"fonts/Carlito-Bold.ttf"']),
+        ])
+        sections = [_section("HEADER", "Jane Doe", order=0)]
+        fpdf_engine(sections, layout, "out.pdf", font_face=font_face)
+        pdf.set_font.assert_any_call("Carlito", style="B", size=11)
+        pdf.set_font.assert_any_call("Carlito", style="", size=11)

@@ -35,6 +35,7 @@ from resumeforge.parser import RcssParser
 from resumeforge.transformer import transform
 
 MOCK_RCSS = """\
+@font-face { font-family: "Consolas"; src: "./fonts/Consolas.ttf"; font-weight: bold; }
 layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
 section[name="HEADER"] { grid-column: 1; padding: 8mm; align: center; }
 section[name="EXPERIENCE"] { grid-column: 2; padding: 6mm; font-size: 12pt; }
@@ -43,3 +44,4 @@ section[name="EXPERIENCE"] { grid-column: 2; padding: 6mm; font-size: 12pt; }
 result = RcssParser().parse(MOCK_RCSS)
 stylesheet = transform(result.tree, {"debug": True})
 print(f"\nResult: {stylesheet}")
+print(f"\nFont face: {stylesheet.font_face}")

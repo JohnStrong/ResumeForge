@@ -1,7 +1,7 @@
 """Transforms a Lark parse tree into domain models (Stylesheet)."""
 
 from lark import Transformer, Token, Tree
-from resumeforge.models import Declaration, LayoutRule, SectionRule, Stylesheet
+from resumeforge.models import Declaration, FontFaceRule, LayoutRule, SectionRule, Stylesheet
 from resumeforge.validator import run_validators
 
 STYLESHEET_RULE_VALIDATORS = [
@@ -54,6 +54,13 @@ class RcssTransformer(Transformer):
         """
         self._log("section_selector", items)
         return str(items[0]).strip('"')
+    
+    def fontface_selector(self, items) -> str:
+        """@font-face is a css-compatible dsl selector. it has no tokens.
+        
+        """
+        self._log("fontface_selector", items)
+        return "font-face"
 
     def rule(self, items) -> LayoutRule | SectionRule:
         """Map a selector + declarations into a LayoutRule or SectionRule.
@@ -66,6 +73,8 @@ class RcssTransformer(Transformer):
         declarations = items[1:]
         if selector == "layout":
             return LayoutRule(declarations=declarations)
+        if selector == "font-face":
+            return FontFaceRule(declarations=declarations)
         return SectionRule(name=selector, declarations=declarations)
 
     def start(self, items) -> Stylesheet:
@@ -83,15 +92,18 @@ class RcssTransformer(Transformer):
         """
         self._log("start", items)
         layout = None
+        font_face = None
         sections = []
         for rule in items:
             if isinstance(rule, LayoutRule):
                 layout = rule
+            elif isinstance(rule, FontFaceRule):
+                font_face = rule
             else:
                 sections.append(rule)
         
         run_validators(STYLESHEET_RULE_VALIDATORS, layout, sections)
-        return Stylesheet(layout=layout, sections=sections)
+        return Stylesheet(layout=layout, sections=sections, font_face=font_face)
 
 
 def transform(tree: Tree, options: dict | None = None) -> Stylesheet:
