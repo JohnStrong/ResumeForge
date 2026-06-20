@@ -4,12 +4,44 @@ from lark import Transformer, Token, Tree
 from resumeforge.models import Declaration, FontFaceRule, LayoutRule, SectionRule, Stylesheet
 from resumeforge.validator import run_validators
 
+def extract_column_widths_from_layout_declarations(layout: LayoutRule) -> Declaration | None:
+    return next((d for d in layout.declarations if d.property == 'column-widths'), None)
+
+def _check_column_widths_format(layout: LayoutRule, _) -> bool:
+    """Ensure column-widths values are integer percentages."""
+    decl = extract_column_widths_from_layout_declarations(layout)
+    if decl is None:
+        return True
+    for v in decl.values:
+        if not v.endswith("%"):
+            return False
+        number = v[:-1]
+        if not number.isdigit():
+            return False
+    return True
+
+def _check_column_widths_sum(layout: LayoutRule, _) -> bool:
+    """Ensure if column_widths is set the values sum to 100%"""
+    decl = extract_column_widths_from_layout_declarations(layout)
+    if decl is None:
+        return True
+    values = [int(v.rstrip("%")) for v in decl.values]
+    return sum(values) == 100
+
 STYLESHEET_RULE_VALIDATORS = [
     {
         "check": lambda layout, _: layout is not None,
         "message": "RCSS must contain a layout { ... } rule",
     },
-   {
+    {
+        "check": _check_column_widths_format,
+        "message": "column-widths values must be whole numbers with % (e.g. \"35% 65%\")",
+    },
+    {
+        "check": _check_column_widths_sum,
+        "message": "column-widths must sum to 100%",
+    },
+    {
         "check": lambda _, sections: len(sections) > 0,
         "message": "RCSS must contain at least one section[name=\"...\"] rule",
     },
