@@ -84,3 +84,14 @@ class TestAdaptLayout:
         ])
         with pytest.raises(ValueError, match="banana"):
             adapt_layout(layout)
+
+    def test_column_widths_defaults_to_equal_split(self):
+        """POSITIVE: column-widths defaults to [50, 50] when not specified"""
+        layout = LayoutRule(declarations=[
+            Declaration(property="mode", values=["grid"]),
+            Declaration(property="columns", values=["2"]),
+            Declaration(property="column-gap", values=["6mm"]),
+            Declaration(property="margins", values=["20mm", "18mm", "20mm", "18mm"]),
+        ])
+        config = adapt_layout(layout)
+        assert config.column_widths == [50, 50]

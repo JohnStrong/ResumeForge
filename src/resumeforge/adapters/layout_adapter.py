@@ -22,7 +22,7 @@ _DECLARATION_ADAPTERS: dict[str, Callable[[Declaration], Any]] = {
 }
 
 def adapt_layout(layout: LayoutRule) -> LayoutConfig:
-    props = {}
+    props = {"column_widths": [50, 50]}
     for decl in layout.declarations:
         decl_adatper = _DECLARATION_ADAPTERS.get(decl.property)
         if decl_adatper:
