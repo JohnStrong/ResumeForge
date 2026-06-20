@@ -9,14 +9,19 @@ from fpdf import FPDF
 from resumeforge.models import Declaration, LayoutRule
 from resumeforge.renderer import RenderSection
 from resumeforge.adapters.fpdf_adapter import SectionRenderStyle, DisplayMode
+from resumeforge.adapters.layout_adapter import LayoutConfig
 from resumeforge.engines.fpdf_engine import fpdf_engine
 
 
 @pytest.fixture
 def layout():
-    return LayoutRule(declarations=[
-        Declaration(property="mode", values=["single"]),
-    ])
+    return LayoutConfig(
+        mode="single",
+        columns=1,
+        column_widths=[100],
+        column_gap=0.0,
+        margins=(20.0, 18.0, 20.0, 18.0),
+    )
 
 
 def _section(name, content, style=None, order=0, grid_column=None):
@@ -145,11 +150,13 @@ class TestFpdfEngineE2E:
         """POSITIVE: grid mode renders sections in separate columns."""
         from pypdf import PdfReader
 
-        grid_layout = LayoutRule(declarations=[
-            Declaration(property="mode", values=["grid"]),
-            Declaration(property="columns", values=["2"]),
-            Declaration(property="column-gap", values=["6mm"]),
-        ])
+        grid_layout = LayoutConfig(
+            mode="grid",
+            columns=2,
+            column_widths=[50, 50],
+            column_gap=6.0,
+            margins=(20.0, 18.0, 20.0, 18.0),
+        )
         output = str(tmp_path / "grid_output.pdf")
         sections = [
             _section("SKILLS", "Python\nTypeScript", order=0, grid_column=1),

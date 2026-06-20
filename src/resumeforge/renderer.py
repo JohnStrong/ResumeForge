@@ -22,7 +22,7 @@ class RenderSection:
 
 
 # Type alias for any render engine function
-RenderEngine = Callable[[list["RenderSection"], LayoutRule, str], None]
+RenderEngine = Callable[[list["RenderSection"], LayoutConfig, str], None]
 
 
 class Renderer:
@@ -32,7 +32,7 @@ class Renderer:
     Engine writes the adapted sections to a specific output format.
     """
 
-    def __init__(self, adapter: StyleAdapter, engine: RenderEngine, layout_adapter: LayoutAdapter | None = None, options: dict | None = None):
+    def __init__(self, adapter: StyleAdapter, engine: RenderEngine, layout_adapter: LayoutAdapter, options: dict | None = None):
         self._debug = options.get("debug") is True if options else False
         self._adapter = adapter
         self._engine = engine
@@ -47,10 +47,8 @@ class Renderer:
         self._log("start", f"rendering {len(sections)} sections to {output_path}")
         self._log("layout", f"{layout.declarations}")
 
-        layout_config = None
-        if self._layout_adapter:
-            layout_config = self._layout_adapter(layout)
-            self._log("layout_config", f"{layout_config}")
+        layout_config = self._layout_adapter(layout)
+        self._log("layout_config", f"{layout_config}")
 
         render_sections = []
         for section in sorted(sections, key=lambda s: s.order):
@@ -69,5 +67,5 @@ class Renderer:
                 grid_column=grid_column,
             ))
 
-        self._engine(render_sections, layout, output_path, font_face=font_face)
+        self._engine(render_sections, layout_config, output_path, font_face=font_face)
         self._log("done", output_path)

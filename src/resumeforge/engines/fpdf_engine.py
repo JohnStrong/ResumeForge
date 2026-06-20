@@ -5,20 +5,8 @@ from fpdf import FPDF
 from resumeforge.models import FontFaceRule, LayoutRule
 from resumeforge.renderer import RenderSection
 from resumeforge.adapters.fpdf_adapter import DisplayMode
+from resumeforge.adapters.layout_adapter import LayoutConfig
 from resumeforge.constants import DEFAULTS
-
-
-def _get_layout_value(layout: LayoutRule, prop: str, default=None):
-    """Extract a single value from layout declarations."""
-    for d in layout.declarations:
-        if d.property == prop:
-            return d.values[0]
-    return default
-
-
-def _parse_mm(value: str) -> float:
-    """Parse a mm value string like '6mm' to float."""
-    return float(value.replace("mm", ""))
 
 
 def _get_font_face_value(font_face: FontFaceRule | None, prop: str, default=None):
@@ -48,10 +36,8 @@ def _register_fonts(pdf: FPDF, font_face: FontFaceRule | None) -> str:
     return family
 
 
-def fpdf_engine(sections: list[RenderSection], layout: LayoutRule, output_path: str, font_face: FontFaceRule | None = None) -> None:
+def fpdf_engine(sections: list[RenderSection], layout_config: LayoutConfig, output_path: str, font_face: FontFaceRule | None = None) -> None:
     """Render sections to a PDF file using fpdf2."""
-    mode = _get_layout_value(layout, "mode", "single")
-
     pdf = FPDF()
     pdf.add_page()
 
@@ -59,8 +45,8 @@ def fpdf_engine(sections: list[RenderSection], layout: LayoutRule, output_path: 
     font_family = _register_fonts(pdf, font_face)
     pdf.set_font(font_family, size=DEFAULTS["body-font-size"])
 
-    if mode == "grid":
-        _render_grid(pdf, sections, layout, font_family)
+    if layout_config.mode == "grid":
+        _render_grid(pdf, sections, layout_config, font_family)
     else:
         _render_single(pdf, sections, font_family)
 
@@ -73,18 +59,19 @@ def _render_single(pdf: FPDF, sections: list[RenderSection], font_family: str) -
         _apply_and_write(pdf, section, w=0, font_family=font_family)
 
 
-def _render_grid(pdf: FPDF, sections: list[RenderSection], layout: LayoutRule, font_family: str) -> None:
+def _render_grid(pdf: FPDF, sections: list[RenderSection], layout_config: LayoutConfig, font_family: str) -> None:
     """Render sections into a 2-column grid layout."""
-    gap = _parse_mm(_get_layout_value(layout, "column-gap", "6mm"))
+    gap = layout_config.column_gap
     page_w = pdf.epw
-    col_w = (page_w - gap) / 2
-    col_x = [pdf.l_margin, pdf.l_margin + col_w + gap]
+    usable_w = page_w - gap
+    col_widths = [usable_w * w / 100 for w in layout_config.column_widths]
+    col_x = [pdf.l_margin, pdf.l_margin + col_widths[0] + gap]
     col_y = [pdf.get_y(), pdf.get_y()]
 
     for section in sections:
         col = (section.grid_column or 1) - 1
         pdf.set_xy(col_x[col], col_y[col])
-        _apply_and_write(pdf, section, w=col_w, x_after=col_x[col], font_family=font_family)
+        _apply_and_write(pdf, section, w=col_widths[col], x_after=col_x[col], font_family=font_family)
         col_y[col] = pdf.get_y()
 
 
