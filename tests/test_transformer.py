@@ -263,3 +263,97 @@ section[name="HEADER"] { font-size: 12pt; }
         result = parser.parse(rcss)
         stylesheet = transform(result.tree)
         assert stylesheet.font_face is None
+
+
+class TestColumnWidthsValidation:
+    """Tests for column-widths sum-to-100% validation rule."""
+
+    def test_column_widths_not_100_raises(self, transformer):
+        """NEGATIVE: column-widths values not summing to 100% raises ValueError"""
+        items = [
+            LayoutRule(declarations=[
+                Declaration(property="mode", values=["grid"]),
+                Declaration(property="columns", values=["2"]),
+                Declaration(property="column-widths", values=["30%", "60%"]),
+            ]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="grid-column", values=["1"])]),
+        ]
+        with pytest.raises(ValueError, match="column-widths must sum to 100%"):
+            transformer.start(items)
+
+    def test_column_widths_not_set_passes(self, transformer):
+        """POSITIVE: no column-widths property does not raise"""
+        items = [
+            LayoutRule(declarations=[
+                Declaration(property="mode", values=["grid"]),
+                Declaration(property="columns", values=["2"]),
+            ]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="grid-column", values=["1"])]),
+        ]
+        result = transformer.start(items)
+        assert result.layout is not None
+
+    def test_column_widths_sum_to_100_passes(self, transformer):
+        """POSITIVE: column-widths summing to 100% does not raise"""
+        items = [
+            LayoutRule(declarations=[
+                Declaration(property="mode", values=["grid"]),
+                Declaration(property="columns", values=["2"]),
+                Declaration(property="column-widths", values=["35%", "65%"]),
+            ]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="grid-column", values=["1"])]),
+        ]
+        result = transformer.start(items)
+        assert result.layout is not None
+
+    def test_missing_percent_all_values_raises(self, transformer):
+        """NEGATIVE: values without % suffix raises ValueError"""
+        items = [
+            LayoutRule(declarations=[
+                Declaration(property="mode", values=["grid"]),
+                Declaration(property="columns", values=["2"]),
+                Declaration(property="column-widths", values=["35", "65"]),
+            ]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="grid-column", values=["1"])]),
+        ]
+        with pytest.raises(ValueError, match="column-widths values must be whole numbers"):
+            transformer.start(items)
+
+    def test_missing_percent_one_value_raises(self, transformer):
+        """NEGATIVE: one value missing % suffix raises ValueError"""
+        items = [
+            LayoutRule(declarations=[
+                Declaration(property="mode", values=["grid"]),
+                Declaration(property="columns", values=["2"]),
+                Declaration(property="column-widths", values=["35%", "65"]),
+            ]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="grid-column", values=["1"])]),
+        ]
+        with pytest.raises(ValueError, match="column-widths values must be whole numbers"):
+            transformer.start(items)
+
+    def test_decimal_values_raises(self, transformer):
+        """NEGATIVE: decimal percentages raises ValueError"""
+        items = [
+            LayoutRule(declarations=[
+                Declaration(property="mode", values=["grid"]),
+                Declaration(property="columns", values=["2"]),
+                Declaration(property="column-widths", values=["33.3%", "66.7%"]),
+            ]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="grid-column", values=["1"])]),
+        ]
+        with pytest.raises(ValueError, match="column-widths values must be whole numbers"):
+            transformer.start(items)
+
+    def test_non_numeric_values_raises(self, transformer):
+        """NEGATIVE: non-numeric values raises ValueError"""
+        items = [
+            LayoutRule(declarations=[
+                Declaration(property="mode", values=["grid"]),
+                Declaration(property="columns", values=["2"]),
+                Declaration(property="column-widths", values=["abc%", "def%"]),
+            ]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="grid-column", values=["1"])]),
+        ]
+        with pytest.raises(ValueError, match="column-widths values must be whole numbers"):
+            transformer.start(items)

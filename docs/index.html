@@ -192,6 +192,7 @@ pip install -e .</code></pre>
             <ul>
                 <li><code>mode</code> — <code>single</code> or <code>grid</code></li>
                 <li><code>columns</code> — number of columns (grid mode, currently <code>2</code>)</li>
+                <li><code>column-widths</code> — width of each column as percentages (grid mode, must sum to 100%, e.g. <code>30% 70%</code>)</li>
                 <li><code>column-gap</code> — gap between columns (e.g. <code>6mm</code>)</li>
                 <li><code>margins</code> — page margins: top right bottom left (e.g. <code>20mm 18mm 20mm 18mm</code>)</li>
                 <li><code>font-family</code> — default font family (e.g. <code>"Helvetica"</code>)</li>
@@ -220,7 +221,7 @@ pip install -e .</code></pre>
                 <li><code>width</code> — proportional column width (e.g. <code>1fr</code>)</li>
             </ul>
 
-            <pre><code>layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
+            <pre><code>layout { mode: grid; columns: 2; column-widths: 30% 70%; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
 
 section[name="HEADER"] { grid-column: 1; padding: 8mm; align: center; }
 section[name="EXPERIENCE"] { grid-column: 2; padding: 6mm; font-size: 12pt; }</code></pre>
@@ -280,7 +281,7 @@ consectetur@faketech.xyz</code></pre>
             <h3>2. Style it with RCSS</h3>
             <pre><code>@font-face { font-family: "Carlito"; src: "examples/fonts/Carlito-Regular.ttf"; src-bold: "examples/fonts/Carlito-Bold.ttf"; }
 
-layout { mode: grid; columns: 2; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
+layout { mode: grid; columns: 2; column-widths: 30% 70%; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
 
 section[name="Lorem Ipsum"] {
   font-size: 22pt;
@@ -362,6 +363,21 @@ section[name="References"] {
             <div class="troubleshoot-item">
                 <strong>"No matching stylesheet rule for one or more sections"</strong>
                 <p>A section was parsed from the CV text but has no corresponding <code>section[name="..."]</code> rule in the stylesheet. Ensure every heading in your <code>.txt</code> file has a matching rule in the <code>.rcss</code>.</p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"column-widths must sum to 100%"</strong>
+                <p>The percentage values in <code>column-widths</code> do not add up to 100. For example, <code>column-widths: 30% 60%;</code> totals 90%. Adjust so they equal 100%.</p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"column-widths values must be whole numbers with %"</strong>
+                <p>Each value in <code>column-widths</code> must be an integer followed by <code>%</code>. Decimal values like <code>33.3%</code> and bare numbers like <code>35</code> are not allowed.</p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"layout property '...' is not valid"</strong>
+                <p>The layout adapter encountered an unrecognised property in <code>layout { ... }</code>. Valid properties: <code>mode</code>, <code>columns</code>, <code>column-widths</code>, <code>column-gap</code>, <code>margins</code>, <code>font-family</code>.</p>
             </div>
         </main>
     </div>
