@@ -5,10 +5,11 @@ from typing import Callable
 
 from resumeforge.models import FontFaceRule, LayoutRule, StyledSection, Declaration
 from resumeforge.adapters.fpdf_adapter import SectionRenderStyle
+from resumeforge.adapters.layout_adapter import LayoutConfig
 
 # Type alias for any adapter function
 StyleAdapter = Callable[[list[Declaration]], SectionRenderStyle]
-
+LayoutAdapter = Callable[[LayoutRule], LayoutConfig]
 
 @dataclass
 class RenderSection:
@@ -31,10 +32,11 @@ class Renderer:
     Engine writes the adapted sections to a specific output format.
     """
 
-    def __init__(self, adapter: StyleAdapter, engine: RenderEngine, options: dict | None = None):
+    def __init__(self, adapter: StyleAdapter, engine: RenderEngine, layout_adapter: LayoutAdapter | None = None, options: dict | None = None):
         self._debug = options.get("debug") is True if options else False
         self._adapter = adapter
         self._engine = engine
+        self._layout_adapter = layout_adapter
 
     def _log(self, step: str, detail: str):
         if self._debug:
@@ -44,6 +46,11 @@ class Renderer:
         """Render styled sections to a PDF file at output_path."""
         self._log("start", f"rendering {len(sections)} sections to {output_path}")
         self._log("layout", f"{layout.declarations}")
+
+        layout_config = None
+        if self._layout_adapter:
+            layout_config = self._layout_adapter(layout)
+            self._log("layout_config", f"{layout_config}")
 
         render_sections = []
         for section in sorted(sections, key=lambda s: s.order):

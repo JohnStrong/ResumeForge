@@ -117,3 +117,28 @@ class TestRendererNegative:
         with pytest.raises(ValueError):
             renderer.render(sections=sections, layout=layout, output_path="out.pdf")
         noop_engine.assert_not_called()
+
+
+class TestRendererLayoutAdapter:
+    """Tests for layout_adapter integration in Renderer."""
+
+    def test_layout_adapter_called_during_render(self, layout, noop_engine):
+        """POSITIVE: layout_adapter is invoked with layout during render."""
+        from resumeforge.adapters.layout_adapter import LayoutConfig
+        adapter = MagicMock(return_value=SectionRenderStyle())
+        layout_adapter = MagicMock(return_value=LayoutConfig(
+            mode="grid", columns=2, column_widths=[35, 65],
+            column_gap=6.0, margins=(20.0, 18.0, 20.0, 18.0),
+        ))
+        sections = [_make_section("HEADER", [Declaration(property="align", values=["center"])], order=0)]
+        renderer = Renderer(adapter=adapter, engine=noop_engine, layout_adapter=layout_adapter)
+        renderer.render(sections=sections, layout=layout, output_path="out.pdf")
+        layout_adapter.assert_called_once_with(layout)
+
+    def test_layout_adapter_not_called_when_none(self, layout, noop_engine):
+        """POSITIVE: render works without layout_adapter (None)."""
+        adapter = MagicMock(return_value=SectionRenderStyle())
+        sections = [_make_section("HEADER", [Declaration(property="align", values=["center"])], order=0)]
+        renderer = Renderer(adapter=adapter, engine=noop_engine, layout_adapter=None)
+        renderer.render(sections=sections, layout=layout, output_path="out.pdf")
+        noop_engine.assert_called_once()
