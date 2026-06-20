@@ -70,6 +70,15 @@ The section mapper received no parsed sections to style. This typically means yo
 **"No matching stylesheet rule for one or more sections"**
 A section was parsed from the CV text but has no corresponding `section[name="..."]` rule in the stylesheet. Ensure every heading in your `.txt` file has a matching rule in the `.rcss`.
 
+**"column-widths must sum to 100%"**
+The percentage values in `column-widths` do not add up to 100. For example, `column-widths: 30% 60%;` totals 90%. Adjust so they equal 100%.
+
+**"column-widths values must be whole numbers with %"**
+Each value in `column-widths` must be an integer followed by `%`. Decimal values like `33.3%` and bare numbers like `35` are not allowed.
+
+**"layout property '...' is not valid"**
+The layout adapter encountered an unrecognised property in `layout { ... }`. Check for typos. Valid properties: `mode`, `columns`, `column-widths`, `column-gap`, `margins`, `font-family`.
+
 ## Testing
 
 ```bash
