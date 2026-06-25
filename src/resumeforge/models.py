@@ -60,6 +60,12 @@ class Stylesheet:
     font_face: FontFaceRule | None = None # optional - falls-back to default font
 
 @dataclass
+class StyledHeading:
+    """A heading with its rcss style and layout rules"""
+    content: str
+    rule: HeadingRule
+
+@dataclass
 class StyledSection:
     """Encapsulated str content with its section rule from a Stylesheet"""
     name: str

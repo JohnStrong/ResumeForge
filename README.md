@@ -79,6 +79,9 @@ Each value in `column-widths` must be an integer followed by `%`. Decimal values
 **"layout property '...' is not valid"**
 The layout adapter encountered an unrecognised property in `layout { ... }`. Check for typos. Valid properties: `mode`, `columns`, `column-widths`, `column-gap`, `margins`, `font-family`.
 
+**"CV text must have heading content (name/contact) before the first section"**
+Your `.txt` file begins immediately with a section heading (e.g. `Skills` or `Experience`) with no name or contact information above it. Every CV must have at least one line of text before the first section — typically your full name, job title, and contact details (email, phone, LinkedIn). This heading block is rendered at the top of the PDF before any sections.
+
 ## Testing
 
 ```bash

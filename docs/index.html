@@ -379,6 +379,11 @@ section[name="References"] {
                 <strong>"layout property '...' is not valid"</strong>
                 <p>The layout adapter encountered an unrecognised property in <code>layout { ... }</code>. Valid properties: <code>mode</code>, <code>columns</code>, <code>column-widths</code>, <code>column-gap</code>, <code>margins</code>, <code>font-family</code>.</p>
             </div>
+
+            <div class="troubleshoot-item">
+                <strong>"CV text must have heading content (name/contact) before the first section"</strong>
+                <p>Your <code>.txt</code> file begins immediately with a section heading (e.g. <code>Skills</code> or <code>Experience</code>) with no name or contact information above it. Every CV must have at least one line of text before the first section — typically your full name, job title, and contact details (email, phone, LinkedIn). This heading block is rendered at the top of the PDF before any sections.</p>
+            </div>
         </main>
     </div>
     <footer>
