@@ -2,9 +2,10 @@ start: rule+
 
 rule: selector "{" declaration+ "}"
 
-selector: "layout"                          -> layout_selector
-        | "section" "[" "name" "=" STRING "]" -> section_selector
-        | "@font-face"                        -> fontface_selector
+selector: "layout"                              -> layout_selector
+        | "heading"                             -> heading_selector
+        | "section" "[" "name" "=" STRING "]"   -> section_selector
+        | "@font-face"                          -> fontface_selector
 
 declaration: PROPERTY ":" value ";"
 

@@ -1,7 +1,7 @@
 """Transforms a Lark parse tree into domain models (Stylesheet)."""
 
 from lark import Transformer, Token, Tree
-from resumeforge.models import Declaration, FontFaceRule, LayoutRule, SectionRule, Stylesheet
+from resumeforge.models import Declaration, FontFaceRule, LayoutRule, SectionRule, Stylesheet, HeadingRule
 from resumeforge.validator import run_validators
 
 def extract_column_widths_from_layout_declarations(layout: LayoutRule) -> Declaration | None:
@@ -78,6 +78,16 @@ class RcssTransformer(Transformer):
         """layout is a dsl selector it doesn't have any tokens"""
         self._log("layout_selector", items)
         return "layout"
+    
+    def heading_selector(self, items) -> str:
+        """heading is a dsl selector representing beginning of a well-formed resume. 
+        
+        e.g. 
+                Name
+            [contact info ..]
+        """
+        self._log("heading_selector", items)
+        return "heading"
 
     def section_selector(self, items) -> str:
         """Extract the section name, stripping quotes from the STRING token.
@@ -107,6 +117,8 @@ class RcssTransformer(Transformer):
             return LayoutRule(declarations=declarations)
         if selector == "font-face":
             return FontFaceRule(declarations=declarations)
+        if selector == "heading":
+            return HeadingRule(declarations=declarations)
         return SectionRule(name=selector, declarations=declarations)
 
     def start(self, items) -> Stylesheet:
@@ -125,17 +137,20 @@ class RcssTransformer(Transformer):
         self._log("start", items)
         layout = None
         font_face = None
+        heading = None
         sections = []
         for rule in items:
             if isinstance(rule, LayoutRule):
                 layout = rule
             elif isinstance(rule, FontFaceRule):
                 font_face = rule
+            elif isinstance(rule, HeadingRule):
+                heading = rule
             else:
                 sections.append(rule)
         
         run_validators(STYLESHEET_RULE_VALIDATORS, layout, sections)
-        return Stylesheet(layout=layout, sections=sections, font_face=font_face)
+        return Stylesheet(layout=layout, heading=heading, sections=sections, font_face=font_face)
 
 
 def transform(tree: Tree, options: dict | None = None) -> Stylesheet:

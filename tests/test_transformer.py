@@ -357,3 +357,79 @@ class TestColumnWidthsValidation:
         ]
         with pytest.raises(ValueError, match="column-widths values must be whole numbers"):
             transformer.start(items)
+
+
+class TestHeadingSelector:
+    """Tests for heading_selector() method."""
+
+    def test_returns_heading_string(self, transformer):
+        """POSITIVE: heading_selector returns 'heading' identifier"""
+        result = transformer.heading_selector([])
+        assert result == "heading"
+
+
+class TestHeadingRule:
+    """Tests for heading rule in transformer."""
+
+    def test_heading_rule_created(self, transformer):
+        """POSITIVE: selector 'heading' with declarations produces HeadingRule"""
+        from resumeforge.models import HeadingRule
+        items = [
+            "heading",
+            Declaration(property="font-size", values=["22pt"]),
+            Declaration(property="align", values=["center"]),
+        ]
+        result = transformer.rule(items)
+        assert isinstance(result, HeadingRule)
+        assert len(result.declarations) == 2
+
+    def test_heading_set_in_stylesheet(self, transformer):
+        """POSITIVE: heading rule is set on Stylesheet"""
+        from resumeforge.models import HeadingRule
+        items = [
+            LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            HeadingRule(declarations=[Declaration(property="font-size", values=["22pt"])]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
+        ]
+        result = transformer.start(items)
+        assert result.heading is not None
+        assert isinstance(result.heading, HeadingRule)
+        assert result.heading.declarations[0].values == ["22pt"]
+
+    def test_no_heading_defaults_to_none(self, transformer):
+        """POSITIVE: stylesheet without heading has heading=None"""
+        items = [
+            LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
+        ]
+        result = transformer.start(items)
+        assert result.heading is None
+
+
+class TestHeadingIntegration:
+    """Integration tests for heading parsing and transformation."""
+
+    def test_full_transform_with_heading(self, parser):
+        """POSITIVE: RCSS with heading transforms into Stylesheet with heading set"""
+        rcss = '''\
+layout { mode: single; }
+heading { font-size: 22pt; align: center; line-height: 7; }
+section[name="Skills"] { font-size: 12pt; }
+'''
+        result = parser.parse(rcss)
+        stylesheet = transform(result.tree)
+        assert stylesheet.heading is not None
+        decls = {d.property: d.values[0] for d in stylesheet.heading.declarations}
+        assert decls["font-size"] == "22pt"
+        assert decls["align"] == "center"
+        assert decls["line-height"] == "7"
+
+    def test_full_transform_without_heading(self, parser):
+        """POSITIVE: RCSS without heading has heading=None"""
+        rcss = '''\
+layout { mode: single; }
+section[name="Skills"] { font-size: 12pt; }
+'''
+        result = parser.parse(rcss)
+        stylesheet = transform(result.tree)
+        assert stylesheet.heading is None

@@ -144,6 +144,7 @@ class TestMapValidation:
         from resumeforge.models import Stylesheet, LayoutRule, SectionRule, Declaration
         return Stylesheet(
             layout=LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            heading=None,
             sections=[SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])])]
         )
 
@@ -167,6 +168,7 @@ class TestMapValidation:
         from resumeforge.models import Stylesheet, LayoutRule, SectionRule, Declaration
         stylesheet = Stylesheet(
             layout=LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            heading=None,
             sections=[
                 SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
                 SectionRule(name="EXPERIENCE", declarations=[Declaration(property="padding", values=["6mm"])]),
@@ -181,6 +183,7 @@ class TestMapValidation:
         from resumeforge.models import Stylesheet, LayoutRule, SectionRule, Declaration
         stylesheet = Stylesheet(
             layout=LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+            heading=None,
             sections=[
                 SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
                 SectionRule(name="EXPERIENCE", declarations=[Declaration(property="padding", values=["6mm"])]),
@@ -192,6 +195,7 @@ class TestMapValidation:
         with pytest.raises(ValueError, match="missing one or more sections"):
             mapper.map("HEADER\nJohn Smith\nEXPERIENCE\nEngineer", Stylesheet(
                 layout=LayoutRule(declarations=[Declaration(property="mode", values=["single"])]),
+                heading=None,
                 sections=[
                     SectionRule(name="HEADER", declarations=[Declaration(property="padding", values=["8mm"])]),
                     SectionRule(name="EXPERIENCE", declarations=[Declaration(property="padding", values=["6mm"])]),
