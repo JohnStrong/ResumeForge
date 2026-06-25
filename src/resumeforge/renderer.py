@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Callable
 
-from resumeforge.models import FontFaceRule, LayoutRule, StyledSection, Declaration
+from resumeforge.models import FontFaceRule, LayoutRule, StyledSection, Declaration, StyledHeading
 from resumeforge.adapters.fpdf_adapter import SectionRenderStyle
 from resumeforge.adapters.layout_adapter import LayoutConfig
 
@@ -22,8 +22,7 @@ class RenderSection:
 
 
 # Type alias for any render engine function
-RenderEngine = Callable[[list["RenderSection"], LayoutConfig, str], None]
-
+RenderEngine = Callable[[list["RenderSection"], LayoutConfig, str, FontFaceRule | None, StyledHeading | None], None]
 
 class Renderer:
     """Takes styled sections and a layout rule, renders to PDF.
@@ -42,10 +41,18 @@ class Renderer:
         if self._debug:
             print(f"[renderer:{step}] {detail}")
 
-    def render(self, sections: list[StyledSection], layout: LayoutRule, output_path: str, font_face: FontFaceRule | None = None) -> None:
+    def render(self, 
+            sections: list[StyledSection],
+            layout: LayoutRule, 
+            output_path: str, 
+            font_face: FontFaceRule | None = None,
+            heading: StyledHeading | None = None
+        ) -> None:
         """Render styled sections to a PDF file at output_path."""
         self._log("start", f"rendering {len(sections)} sections to {output_path}")
         self._log("layout", f"{layout.declarations}")
+        if heading is not None:
+            self._log("heading", f"{heading.rule.declarations if heading.rule else 'defaults'}")
 
         layout_config = self._layout_adapter(layout)
         self._log("layout_config", f"{layout_config}")
@@ -67,5 +74,5 @@ class Renderer:
                 grid_column=grid_column,
             ))
 
-        self._engine(render_sections, layout_config, output_path, font_face=font_face)
+        self._engine(render_sections, layout_config, output_path, font_face=font_face, heading=heading)
         self._log("done", output_path)

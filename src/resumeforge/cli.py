@@ -60,7 +60,10 @@ def cmd_render(args) -> int:
     # 4. Render PDF from input .txt using transformed style models
     print("[4/4] ✓ Rendering PDF")
     Renderer(adapter=adapt_declarations, engine=fpdf_engine, layout_adapter=adapt_layout).render(
-        sections=styled_sections, layout=stylesheet.layout, output_path=args.output, font_face=stylesheet.font_face
+        sections=styled_sections, 
+        layout=stylesheet.layout, 
+        output_path=args.output, 
+        font_face=stylesheet.font_face
     )
     return 0
 
