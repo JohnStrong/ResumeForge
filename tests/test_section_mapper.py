@@ -1,7 +1,7 @@
 """Tests for SectionMapper._split_sections."""
 
 import pytest
-from resumeforge.section_mapper import SectionMapper
+from resumeforge.mappers.section_mapper import SectionMapper
 from resumeforge.models import RawSection
 
 

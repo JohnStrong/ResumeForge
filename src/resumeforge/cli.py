@@ -6,7 +6,7 @@ from pathlib import Path
 
 from resumeforge.parser import RcssParser
 from resumeforge.transformer import transform
-from resumeforge.section_mapper import SectionMapper
+from resumeforge.mappers.section_mapper import SectionMapper
 from resumeforge.renderer import Renderer
 from resumeforge.adapters.fpdf_adapter import adapt_declarations
 from resumeforge.adapters.layout_adapter import adapt_layout
