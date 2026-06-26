@@ -18,6 +18,7 @@
   - [Section identification](#section-identification)
   - [.rcss basics (MVP)](#rcss-basics-mvp)
   - [Example .rcss snippets](#example-rcss-snippets)
+- [Contributing](#contributing)
 - [Examples](#examples)
 
 ## About
