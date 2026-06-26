@@ -2,7 +2,7 @@
 
 from fpdf import FPDF
 
-from resumeforge.models import FontFaceRule, LayoutRule
+from resumeforge.models import FontFaceRule, StyledHeading
 from resumeforge.renderer import RenderSection
 from resumeforge.adapters.fpdf_adapter import DisplayMode
 from resumeforge.adapters.layout_adapter import LayoutConfig
@@ -87,7 +87,13 @@ def _apply_and_write(pdf: FPDF, section: RenderSection, w: float, font_family: s
     else:
         pdf.cell(w=w, text=section.content, **write_params)
 
-def fpdf_engine(sections: list[RenderSection], layout_config: LayoutConfig, output_path: str, font_face: FontFaceRule | None = None) -> None:
+def fpdf_engine(
+    sections: list[RenderSection], 
+    layout_config: LayoutConfig,
+    output_path: str, 
+    font_face: FontFaceRule | None = None,
+    styled_heading: StyledHeading | None = None
+) -> None:
     """Render sections to a PDF file using fpdf2."""
     pdf = FPDF()
     pdf.add_page()
