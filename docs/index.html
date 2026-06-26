@@ -198,27 +198,34 @@ pip install -e .</code></pre>
                 <li><code>font-family</code> — default font family (e.g. <code>"Helvetica"</code>)</li>
             </ul>
 
-            <h3>Section style properties</h3>
-            <p>PDF render mode — applied as PDF state before writing content:</p>
+            <h3>Heading properties</h3>
+            <p>Used inside <code>heading { ... }</code> (optional — styles the resume header. If omitted, ATS-friendly defaults are applied):</p>
             <ul>
-                <li><code>font-size</code> — text size (e.g. <code>12pt</code>)</li>
-                <li><code>color</code> — text color in hex (e.g. <code>#333333</code>)</li>
-                <li><code>background-color</code> — section fill color in hex (e.g. <code>#f0f0f0</code>)</li>
+                <li><code>font-size</code> — name/first line font size (default: <code>20pt</code>). Subsequent lines (contact info, title) are scaled down proportionally</li>
+                <li><code>align</code> — text alignment: <code>left</code>, <code>center</code>, <code>right</code> (default: <code>center</code>)</li>
+                <li><code>line-height</code> — line height in mm (default: <code>7</code>)</li>
+                <li><code>color</code> — text color in hex (default: black)</li>
             </ul>
 
-            <h3>Section write properties</h3>
-            <p>PDF render mode — control how content is rendered:</p>
+            <h3>Section properties</h3>
+            <p>Used inside <code>section[name="..."] { ... }</code>:</p>
+            <p><strong>Style</strong> (applied as PDF state before writing):</p>
             <ul>
-                <li><code>align</code> — <code>left</code>, <code>center</code>, or <code>right</code></li>
-                <li><code>line-height</code> — line height in mm (e.g. <code>7</code>)</li>
-                <li><code>display</code> — <code>block</code> (multi-line wrap) or <code>inline</code> (horizontal flow)</li>
+                <li><code>font-size</code> — text size (default: <code>11pt</code>)</li>
+                <li><code>color</code> — text color in hex (default: black)</li>
+                <li><code>background-color</code> — section fill color in hex (default: none)</li>
             </ul>
-
-            <h3>Section layout positioning (grid mode)</h3>
+            <p><strong>Write</strong> (control how content is rendered):</p>
             <ul>
-                <li><code>grid-column</code> — <code>1</code> or <code>2</code></li>
-                <li><code>padding</code> — inner spacing (e.g. <code>8mm</code>)</li>
-                <li><code>width</code> — proportional column width (e.g. <code>1fr</code>)</li>
+                <li><code>align</code> — <code>left</code>, <code>center</code>, or <code>right</code> (default: <code>left</code>)</li>
+                <li><code>line-height</code> — line height in mm (default: <code>5</code>)</li>
+                <li><code>display</code> — <code>block</code> (multi-line wrap) or <code>inline</code> (horizontal flow) (default: <code>block</code>)</li>
+            </ul>
+            <p><strong>Layout positioning</strong> (grid mode only):</p>
+            <ul>
+                <li><code>grid-column</code> — <code>1</code> or <code>2</code> (required in grid mode)</li>
+                <li><code>padding</code> — inner spacing (default: <code>0</code>)</li>
+                <li><code>width</code> — proportional column width (default: <code>1fr</code>)</li>
             </ul>
 
             <pre><code>layout { mode: grid; columns: 2; column-widths: 30% 70%; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
@@ -378,6 +385,11 @@ section[name="References"] {
             <div class="troubleshoot-item">
                 <strong>"layout property '...' is not valid"</strong>
                 <p>The layout adapter encountered an unrecognised property in <code>layout { ... }</code>. Valid properties: <code>mode</code>, <code>columns</code>, <code>column-widths</code>, <code>column-gap</code>, <code>margins</code>, <code>font-family</code>.</p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>"CV text must have heading content (name/contact) before the first section"</strong>
+                <p>Your <code>.txt</code> file begins immediately with a section heading (e.g. <code>Skills</code> or <code>Experience</code>) with no name or contact information above it. Every CV must have at least one line of text before the first section — typically your full name, job title, and contact details (email, phone, LinkedIn). This heading block is rendered at the top of the PDF before any sections.</p>
             </div>
         </main>
     </div>

@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import MagicMock, call
 
 from resumeforge.models import (
-    Declaration, LayoutRule, SectionRule, StyledSection,
+    Declaration, LayoutRule, SectionRule, StyledSection, StyledHeading,
 )
 from resumeforge.adapters.fpdf_adapter import SectionRenderStyle, DisplayMode
 from resumeforge.adapters.layout_adapter import LayoutConfig, adapt_layout
@@ -159,3 +159,46 @@ class TestRendererLayoutAdapter:
         renderer.render(sections=sections, layout=layout, output_path="out.pdf")
         args, _ = noop_engine.call_args
         assert args[1] == expected_config
+
+
+class TestRendererHeading:
+    """Tests for heading parameter passed to engine."""
+
+    def test_heading_passed_to_engine_when_set(self, layout, noop_engine, mock_layout_adapter):
+        """POSITIVE: heading_config is forwarded to the engine when heading provided."""
+        from resumeforge.models import HeadingRule
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        adapter = MagicMock(return_value=SectionRenderStyle())
+        heading = StyledHeading(
+            content="John Doe\njohn@email.com",
+            rule=HeadingRule(declarations=[Declaration(property="font-size", values=["22pt"])]),
+        )
+        sections = [_make_section("HEADER", [Declaration(property="align", values=["center"])], order=0)]
+        renderer = Renderer(adapter=adapter, engine=noop_engine, layout_adapter=mock_layout_adapter)
+        renderer.render(sections=sections, layout=layout, output_path="out.pdf", heading=heading)
+        _, kwargs = noop_engine.call_args
+        assert kwargs["heading_config"] is not None
+        assert isinstance(kwargs["heading_config"], HeadingConfig)
+        assert kwargs["heading_config"].content == "John Doe\njohn@email.com"
+
+    def test_heading_none_passed_to_engine_when_not_set(self, layout, noop_engine, mock_layout_adapter):
+        """POSITIVE: heading_config is None when heading not provided."""
+        adapter = MagicMock(return_value=SectionRenderStyle())
+        sections = [_make_section("HEADER", [Declaration(property="align", values=["center"])], order=0)]
+        renderer = Renderer(adapter=adapter, engine=noop_engine, layout_adapter=mock_layout_adapter)
+        renderer.render(sections=sections, layout=layout, output_path="out.pdf")
+        _, kwargs = noop_engine.call_args
+        assert kwargs["heading_config"] is None
+
+    def test_heading_with_none_rule_uses_defaults(self, layout, noop_engine, mock_layout_adapter):
+        """POSITIVE: heading with rule=None produces HeadingConfig with defaults."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        adapter = MagicMock(return_value=SectionRenderStyle())
+        heading = StyledHeading(content="Jane Smith\nEngineer", rule=None)
+        sections = [_make_section("HEADER", [Declaration(property="align", values=["center"])], order=0)]
+        renderer = Renderer(adapter=adapter, engine=noop_engine, layout_adapter=mock_layout_adapter)
+        renderer.render(sections=sections, layout=layout, output_path="out.pdf", heading=heading)
+        _, kwargs = noop_engine.call_args
+        assert kwargs["heading_config"].font_size == 20
+        assert kwargs["heading_config"].align == "center"
+        assert kwargs["heading_config"].line_height == 7

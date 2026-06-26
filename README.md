@@ -79,6 +79,9 @@ Each value in `column-widths` must be an integer followed by `%`. Decimal values
 **"layout property '...' is not valid"**
 The layout adapter encountered an unrecognised property in `layout { ... }`. Check for typos. Valid properties: `mode`, `columns`, `column-widths`, `column-gap`, `margins`, `font-family`.
 
+**"CV text must have heading content (name/contact) before the first section"**
+Your `.txt` file begins immediately with a section heading (e.g. `Skills` or `Experience`) with no name or contact information above it. Every CV must have at least one line of text before the first section — typically your full name, job title, and contact details (email, phone, LinkedIn). This heading block is rendered at the top of the PDF before any sections.
+
 ## Testing
 
 ```bash
@@ -109,35 +112,45 @@ pytest
 | `margins` | e.g. `20mm 18mm 20mm 18mm` | Page margins (top right bottom left) |
 | `font-family` | e.g. `"Helvetica"` | Default font (overridden by @font-face) |
 
-#### Font face properties (in `@font-face { ... }`)
+#### Font face properties (in `@font-face { ... }`) — optional
 | Property | Values | Description |
 |---|---|---|
 | `font-family` | e.g. `"Carlito"` | Font family name to register |
 | `src` | e.g. `"fonts/Carlito-Regular.ttf"` | Path to regular weight TTF |
 | `src-bold` | e.g. `"fonts/Carlito-Bold.ttf"` | Path to bold weight TTF |
 
+#### Heading properties (in `heading { ... }`) — optional
+The `heading` block styles the resume header (name, title, contact info) that appears before the first section. If omitted, ATS-friendly defaults are applied automatically.
+
+| Property | Values | Default | Description |
+|---|---|---|---|
+| `font-size` | e.g. `20pt` | `20pt` | Name/first line font size. Subsequent lines (contact info, title) are scaled down proportionally |
+| `align` | `left`, `center`, `right` | `center` | Text alignment |
+| `line-height` | e.g. `7` | `7` | Line height in mm |
+| `color` | e.g. `#333333` | black | Text color (hex) |
+
 #### Section properties (in `section[name="..."] { ... }`)
 
 **Style properties** (PDF render mode — applied as PDF state before writing):
-| Property | Values | Description |
-|---|---|---|
-| `font-size` | e.g. `12pt` | Text size |
-| `color` | e.g. `#333333` | Text color (hex) |
-| `background-color` | e.g. `#f0f0f0` | Section fill color (hex) |
+| Property | Values | Default | Description |
+|---|---|---|---|
+| `font-size` | e.g. `12pt` | `11pt` | Text size |
+| `color` | e.g. `#333333` | black | Text color (hex) |
+| `background-color` | e.g. `#f0f0f0` | none | Section fill color (hex) |
 
 **Write properties** (PDF render mode — control how content is rendered):
-| Property | Values | Description |
-|---|---|---|
-| `align` | `left`, `center`, `right` | Text alignment |
-| `line-height` | e.g. `7` | Line height in mm |
-| `display` | `block`, `inline` | Block wraps text (multi-line), inline flows horizontally |
+| Property | Values | Default | Description |
+|---|---|---|---|
+| `align` | `left`, `center`, `right` | `left` | Text alignment |
+| `line-height` | e.g. `7` | `5` | Line height in mm |
+| `display` | `block`, `inline` | `block` | Block wraps text (multi-line), inline flows horizontally |
 
 **Layout positioning** (grid mode only):
-| Property | Values | Description |
-|---|---|---|
-| `grid-column` | `1`, `2` | Which column to place the section in |
-| `padding` | e.g. `8mm` | Inner spacing |
-| `width` | e.g. `1fr` | Proportional column width |
+| Property | Values | Default | Description |
+|---|---|---|---|
+| `grid-column` | `1`, `2` | — | Which column to place the section in |
+| `padding` | e.g. `8mm` | `0` | Inner spacing |
+| `width` | e.g. `1fr` | `1fr` | Proportional column width |
 
 ### Example .rcss snippets
 Single-column (resume-single.rcss)

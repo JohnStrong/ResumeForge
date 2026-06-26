@@ -34,6 +34,11 @@ class LayoutRule:
     """The layout { ... } block — page-level settings"""
     declarations: list[Declaration]
     # Convenience: pull out mode, columns, margins etc. later via helper methods
+
+@dataclass
+class HeadingRule:
+    """The heading { } block - top level text content for Name, contact info and title"""
+    declarations: list[Declaration]
   
 @dataclass
 class SectionRule:
@@ -50,8 +55,15 @@ class FontFaceRule:
 class Stylesheet:
     """The complete parsed .rcss file as domain objects"""
     layout: LayoutRule # required — every .rcss must have a layout block
+    heading: HeadingRule | None # optional - falls-back to using ATS resonable defaults
     sections: list[SectionRule] # required - every .rcss must have 1..N section blocks
     font_face: FontFaceRule | None = None # optional - falls-back to default font
+
+@dataclass
+class StyledHeading:
+    """A heading with its rcss style and layout rules"""
+    content: str
+    rule: HeadingRule
 
 @dataclass
 class StyledSection:

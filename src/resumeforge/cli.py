@@ -6,7 +6,8 @@ from pathlib import Path
 
 from resumeforge.parser import RcssParser
 from resumeforge.transformer import transform
-from resumeforge.section_mapper import SectionMapper
+from resumeforge.mappers.section_mapper import SectionMapper
+from resumeforge.mappers.heading_mapper import map as map_heading
 from resumeforge.renderer import Renderer
 from resumeforge.adapters.fpdf_adapter import adapt_declarations
 from resumeforge.adapters.layout_adapter import adapt_layout
@@ -55,12 +56,17 @@ def cmd_render(args) -> int:
     # 3. Map raw text sections to their style sheet rules
     print("[3/4] ✓ Mapping CV sections to style rules")
     cv_text = Path(args.input).read_text()
+    styled_heading = map_heading(cv_text, stylesheet)
     styled_sections = SectionMapper(options={"debug":True}).map(text=cv_text, stylesheet=stylesheet)
     
     # 4. Render PDF from input .txt using transformed style models
     print("[4/4] ✓ Rendering PDF")
     Renderer(adapter=adapt_declarations, engine=fpdf_engine, layout_adapter=adapt_layout).render(
-        sections=styled_sections, layout=stylesheet.layout, output_path=args.output, font_face=stylesheet.font_face
+        sections=styled_sections, 
+        layout=stylesheet.layout, 
+        output_path=args.output, 
+        font_face=stylesheet.font_face,
+        heading=styled_heading
     )
     return 0
 

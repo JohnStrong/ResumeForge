@@ -294,3 +294,36 @@ class TestParseResultNegative:
         result = parser.parse('header { padding: 8mm; }')
         assert "Line 1" in result.message
         assert "Col 1" in result.message
+
+
+class TestHeadingRule:
+    """Tests for heading { } selector parsing."""
+
+    def test_rcss_with_heading_parses(self, parser):
+        """POSITIVE: heading selector is valid RCSS"""
+        rcss = """\
+layout { mode: single; }
+heading { font-size: 22pt; align: center; line-height: 7; }
+section[name="Skills"] { font-size: 12pt; }
+"""
+        result = parser.parse(rcss)
+        assert result.valid is True
+
+    def test_rcss_without_heading_parses(self, parser):
+        """POSITIVE: heading is optional — RCSS without it is valid"""
+        rcss = """\
+layout { mode: single; }
+section[name="Skills"] { font-size: 12pt; }
+"""
+        result = parser.parse(rcss)
+        assert result.valid is True
+
+    def test_heading_with_multiple_properties(self, parser):
+        """POSITIVE: heading with multiple declarations parses"""
+        rcss = """\
+layout { mode: grid; columns: 2; column-widths: 50% 50%; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; }
+heading { font-size: 20pt; align: center; line-height: 8; color: #333333; }
+section[name="Experience"] { grid-column: 2; }
+"""
+        result = parser.parse(rcss)
+        assert result.valid is True

@@ -2,10 +2,11 @@
 
 from fpdf import FPDF
 
-from resumeforge.models import FontFaceRule, LayoutRule
+from resumeforge.models import FontFaceRule
 from resumeforge.renderer import RenderSection
 from resumeforge.adapters.fpdf_adapter import DisplayMode
 from resumeforge.adapters.layout_adapter import LayoutConfig
+from resumeforge.adapters.heading_adapter import HeadingConfig
 from resumeforge.constants import DEFAULTS
 
 
@@ -35,22 +36,38 @@ def _register_fonts(pdf: FPDF, font_face: FontFaceRule | None) -> str:
 
     return family
 
+def _render_heading(pdf: FPDF, heading_config: HeadingConfig | None, font_family: str) -> None:
+    """Render heading with Applicant name, contact info and role/title information."""
+    if heading_config is None:
+        return
 
-def fpdf_engine(sections: list[RenderSection], layout_config: LayoutConfig, output_path: str, font_face: FontFaceRule | None = None) -> None:
-    """Render sections to a PDF file using fpdf2."""
-    pdf = FPDF()
-    pdf.add_page()
+    lines = heading_config.content.splitlines()
+    if not lines:
+        return
 
-    # Register custom font or use default
-    font_family = _register_fonts(pdf, font_face)
-    pdf.set_font(font_family, size=DEFAULTS["body-font-size"])
+    font_size = int(heading_config.font_size) if isinstance(heading_config.font_size, str) else heading_config.font_size
+    line_height = int(heading_config.line_height) if isinstance(heading_config.line_height, str) else heading_config.line_height
+    align = heading_config.align[0].upper()  # "center" -> "C", "left" -> "L", "right" -> "R"
 
-    if layout_config.mode == "grid":
-        _render_grid(pdf, sections, layout_config, font_family)
-    else:
-        _render_single(pdf, sections, font_family)
+    if heading_config.color:
+        r, g, b = int(heading_config.color[1:3], 16), int(heading_config.color[3:5], 16), int(heading_config.color[5:7], 16)
+        pdf.set_text_color(r, g, b)
 
-    pdf.output(output_path)
+    # First line: name — bold, at font_size
+    pdf.set_font(font_family, style="B", size=font_size)
+    pdf.multi_cell(w=0, h=line_height, text=lines[0], align=align, new_x="LMARGIN", new_y="NEXT")
+
+    # Remaining lines: contact/title — regular, scaled down
+    if len(lines) > 1:
+        contact_size = round(font_size * 0.55)
+        pdf.set_font(font_family, style="", size=contact_size)
+        for line in lines[1:]:
+            if line.strip():
+                pdf.multi_cell(w=0, h=line_height, text=line, align=align, new_x="LMARGIN", new_y="NEXT")
+
+    # Reset for subsequent sections
+    pdf.set_text_color(0, 0, 0)
+    pdf.ln(line_height)
 
 
 def _render_single(pdf: FPDF, sections: list[RenderSection], font_family: str) -> None:
@@ -103,3 +120,26 @@ def _apply_and_write(pdf: FPDF, section: RenderSection, w: float, font_family: s
         pdf.multi_cell(w=w, text=section.content, new_x=new_x, new_y="NEXT", **write_params)
     else:
         pdf.cell(w=w, text=section.content, **write_params)
+
+def fpdf_engine(
+    sections: list[RenderSection], 
+    layout_config: LayoutConfig,
+    output_path: str, 
+    font_face: FontFaceRule | None = None,
+    heading_config: HeadingConfig | None = None
+) -> None:
+    """Render sections to a PDF file using fpdf2."""
+    pdf = FPDF()
+    pdf.add_page()
+
+    # Register custom font or use default
+    font_family = _register_fonts(pdf, font_face)
+    pdf.set_font(font_family, size=DEFAULTS["body-font-size"])
+
+    _render_heading(pdf, heading_config, font_family)
+    if layout_config.mode == "grid":
+        _render_grid(pdf, sections, layout_config, font_family)
+    else:
+        _render_single(pdf, sections, font_family)
+
+    pdf.output(output_path)
