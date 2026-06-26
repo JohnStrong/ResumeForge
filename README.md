@@ -46,8 +46,8 @@ resumeforge version
 
 ### Troubleshooting
 
-**"Unexpected token ... Expected one of: LAYOUT, SECTION"**
-Your `.rcss` file has an invalid selector. Only `layout { ... }` and `section[name="..."] { ... }` are valid. Check for typos in the selector keyword.
+**"Unexpected token ... Expected one of: HEADING, LAYOUT, @font-face, SECTION"**
+Your `.rcss` file has an invalid selector. Only `layout { ... }`, `heading { ... }`, `@font-face { ... }`, and `section[name="..."] { ... }` are valid. Check for typos in the selector keyword.
 
 **"Unexpected token ... Expected one of: SEMICOLON"**
 A property declaration is missing its trailing semicolon. Every declaration must end with `;`.

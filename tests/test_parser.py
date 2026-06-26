@@ -212,6 +212,8 @@ class TestValidateNegative:
         assert result.valid is False
         assert "Line 1, Col 1" in result.message
         assert "LAYOUT" in result.message
+        assert "HEADING" in result.message
+        assert "@font-face" in result.message
         assert "SECTION" in result.message
 
     def test_missing_semicolon(self, parser):
