@@ -172,6 +172,21 @@ class TestFpdfEngineE2E:
         assert "EXPERIENCE" in page_text
         assert "Engineer at Acme" in page_text
 
+    def test_heading_content_in_pdf(self, layout, tmp_path):
+        """POSITIVE: generated PDF contains heading name and contact info."""
+        from pypdf import PdfReader
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+
+        output = str(tmp_path / "heading_test.pdf")
+        heading = HeadingConfig(content="Jane Doe\nSenior Engineer\njane@test.com", font_size=20, align="center", line_height=7)
+        fpdf_engine([], layout, output, heading_config=heading)
+
+        reader = PdfReader(output)
+        page_text = reader.pages[0].extract_text()
+        assert "Jane Doe" in page_text
+        assert "Senior Engineer" in page_text
+        assert "jane@test.com" in page_text
+
 
 class TestFpdfEngineFonts:
     """Tests for font registration and usage in fpdf_engine."""
@@ -237,3 +252,84 @@ class TestFpdfEngineFonts:
         fpdf_engine(sections, layout, "out.pdf", font_face=font_face)
         pdf.set_font.assert_any_call("Carlito", style="B", size=11)
         pdf.set_font.assert_any_call("Carlito", style="", size=11)
+
+
+class TestRenderHeading:
+    """Tests for _render_heading in fpdf engine."""
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_name_rendered_bold(self, MockFPDF, layout):
+        """POSITIVE: first line (name) is rendered bold at heading font_size."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe\njohn@email.com", font_size=20, align="center", line_height=7)
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        pdf.set_font.assert_any_call("Helvetica", style="B", size=20)
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_contact_scaled_down(self, MockFPDF, layout):
+        """POSITIVE: contact lines are rendered at 55% of font_size."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe\njohn@email.com", font_size=20, align="center", line_height=7)
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        pdf.set_font.assert_any_call("Helvetica", style="", size=11)  # round(20 * 0.55)
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_uses_center_align(self, MockFPDF, layout):
+        """POSITIVE: heading multi_cell uses centered alignment by default."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe", font_size=20, align="center", line_height=7)
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        pdf.multi_cell.assert_any_call(w=0, h=7, text="John Doe", align="C", new_x="LMARGIN", new_y="NEXT")
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_uses_left_align(self, MockFPDF, layout):
+        """POSITIVE: heading respects left alignment override."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe", font_size=20, align="left", line_height=7)
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        pdf.multi_cell.assert_any_call(w=0, h=7, text="John Doe", align="L", new_x="LMARGIN", new_y="NEXT")
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_applies_color(self, MockFPDF, layout):
+        """POSITIVE: heading applies color when set."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe", font_size=20, align="center", line_height=7, color="#336699")
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        pdf.set_text_color.assert_any_call(51, 102, 153)
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_skips_blank_lines(self, MockFPDF, layout):
+        """POSITIVE: blank lines in heading content are skipped."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe\n\njohn@email.com", font_size=20, align="center", line_height=7)
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        texts = [call[1]["text"] for call in pdf.multi_cell.call_args_list if "text" in call[1]]
+        assert "" not in texts
+        assert "John Doe" in texts
+        assert "john@email.com" in texts
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_none_skips_render(self, MockFPDF, layout):
+        """POSITIVE: no heading calls when heading_config is None."""
+        pdf = MockFPDF.return_value
+        fpdf_engine([], layout, "out.pdf", heading_config=None)
+        # Only the initial set_font for body should be called
+        assert pdf.multi_cell.call_count == 0
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_resets_color_after(self, MockFPDF, layout):
+        """POSITIVE: text color is reset to black after heading."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe", font_size=20, align="center", line_height=7, color="#ff0000")
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        # Last set_text_color call should be reset to black
+        last_color_call = pdf.set_text_color.call_args_list[-1]
+        assert last_color_call == ((0, 0, 0),)
+

@@ -6,6 +6,7 @@ from typing import Callable
 from resumeforge.models import FontFaceRule, LayoutRule, StyledSection, Declaration, StyledHeading
 from resumeforge.adapters.fpdf_adapter import SectionRenderStyle
 from resumeforge.adapters.layout_adapter import LayoutConfig
+from resumeforge.adapters.heading_adapter import adapt_heading
 
 # Type alias for any adapter function
 StyleAdapter = Callable[[list[Declaration]], SectionRenderStyle]
@@ -51,11 +52,12 @@ class Renderer:
         """Render styled sections to a PDF file at output_path."""
         self._log("start", f"rendering {len(sections)} sections to {output_path}")
         self._log("layout", f"{layout.declarations}")
-        if heading is not None:
-            self._log("heading", f"{heading.rule.declarations if heading.rule else 'defaults'}")
 
         layout_config = self._layout_adapter(layout)
         self._log("layout_config", f"{layout_config}")
+
+        heading_config = adapt_heading(heading)
+        self._log("heading_config", f"{heading_config}")
 
         render_sections = []
         for section in sorted(sections, key=lambda s: s.order):
@@ -74,5 +76,5 @@ class Renderer:
                 grid_column=grid_column,
             ))
 
-        self._engine(render_sections, layout_config, output_path, font_face=font_face, heading=heading)
+        self._engine(render_sections, layout_config, output_path, font_face=font_face, heading_config=heading_config)
         self._log("done", output_path)
