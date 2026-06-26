@@ -36,23 +36,6 @@ def _register_fonts(pdf: FPDF, font_face: FontFaceRule | None) -> str:
     return family
 
 
-def fpdf_engine(sections: list[RenderSection], layout_config: LayoutConfig, output_path: str, font_face: FontFaceRule | None = None) -> None:
-    """Render sections to a PDF file using fpdf2."""
-    pdf = FPDF()
-    pdf.add_page()
-
-    # Register custom font or use default
-    font_family = _register_fonts(pdf, font_face)
-    pdf.set_font(font_family, size=DEFAULTS["body-font-size"])
-
-    if layout_config.mode == "grid":
-        _render_grid(pdf, sections, layout_config, font_family)
-    else:
-        _render_single(pdf, sections, font_family)
-
-    pdf.output(output_path)
-
-
 def _render_single(pdf: FPDF, sections: list[RenderSection], font_family: str) -> None:
     """Render sections sequentially in a single column."""
     for section in sections:
@@ -103,3 +86,19 @@ def _apply_and_write(pdf: FPDF, section: RenderSection, w: float, font_family: s
         pdf.multi_cell(w=w, text=section.content, new_x=new_x, new_y="NEXT", **write_params)
     else:
         pdf.cell(w=w, text=section.content, **write_params)
+
+def fpdf_engine(sections: list[RenderSection], layout_config: LayoutConfig, output_path: str, font_face: FontFaceRule | None = None) -> None:
+    """Render sections to a PDF file using fpdf2."""
+    pdf = FPDF()
+    pdf.add_page()
+
+    # Register custom font or use default
+    font_family = _register_fonts(pdf, font_face)
+    pdf.set_font(font_family, size=DEFAULTS["body-font-size"])
+
+    if layout_config.mode == "grid":
+        _render_grid(pdf, sections, layout_config, font_family)
+    else:
+        _render_single(pdf, sections, font_family)
+
+    pdf.output(output_path)
