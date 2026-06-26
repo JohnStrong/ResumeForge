@@ -86,6 +86,30 @@ class TestFpdfEnginePositive:
         assert call_order[0] == "font_size"
 
     @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_section_heading_rendered_in_black(self, MockFPDF, layout):
+        """POSITIVE: section heading is always black — set_text_color(0,0,0) called before heading write."""
+        pdf = MockFPDF.return_value
+        pdf.font_size_pt = 10
+        setter = lambda p: p.set_text_color(51, 102, 153)
+        style = SectionRenderStyle(state_setters=[setter])
+        sections = [_section("Links", "github.com", style)]
+        fpdf_engine(sections, layout, "out.pdf")
+        # Black is set at least twice: once at reset, once before heading
+        black_calls = [c for c in pdf.set_text_color.call_args_list if c == ((0, 0, 0),)]
+        assert len(black_calls) >= 2
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_section_content_uses_color_override(self, MockFPDF, layout):
+        """POSITIVE: section body content uses the color from rcss after black heading."""
+        pdf = MockFPDF.return_value
+        pdf.font_size_pt = 10
+        setter = lambda p: p.set_text_color(51, 102, 153)
+        style = SectionRenderStyle(state_setters=[setter])
+        sections = [_section("Links", "github.com", style)]
+        fpdf_engine(sections, layout, "out.pdf")
+        pdf.set_text_color.assert_any_call(51, 102, 153)
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
     def test_write_params_passed_to_multi_cell(self, MockFPDF, layout):
         """POSITIVE: write_params are spread into the content multi_cell call."""
         pdf = MockFPDF.return_value

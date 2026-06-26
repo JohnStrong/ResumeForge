@@ -109,9 +109,15 @@ def _apply_and_write(pdf: FPDF, section: RenderSection, w: float, font_family: s
     body_size = pdf.font_size_pt or DEFAULTS["body-font-size"]
     line_h = section.style.write_params.get("h", DEFAULTS["line-height"])
 
-    # Write section heading — bold
+    # Write section heading — bold, always black
+    pdf.set_text_color(0, 0, 0)
     pdf.set_font(font_family, style="B", size=heading_size)
     pdf.multi_cell(w=w, h=line_h, text=section.name, new_x=new_x, new_y="NEXT")
+
+    # Re-apply style setters (list of callables from SectionRenderStyle) to restore
+    # section color for body content — each setter is a lambda that mutates pdf state
+    for setter in section.style.state_setters:
+        setter(pdf)
 
     # Write section content — regular
     pdf.set_font(font_family, style="", size=body_size)
