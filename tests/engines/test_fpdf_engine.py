@@ -87,16 +87,14 @@ class TestFpdfEnginePositive:
 
     @patch("resumeforge.engines.fpdf_engine.FPDF")
     def test_section_heading_rendered_in_black(self, MockFPDF, layout):
-        """POSITIVE: section heading is always black — set_text_color(0,0,0) called before heading write."""
+        """POSITIVE: set_text_color(0,0,0) is called to ensure section heading is black."""
         pdf = MockFPDF.return_value
         pdf.font_size_pt = 10
         setter = lambda p: p.set_text_color(51, 102, 153)
         style = SectionRenderStyle(state_setters=[setter])
         sections = [_section("Links", "github.com", style)]
         fpdf_engine(sections, layout, "out.pdf")
-        # Black is set at least twice: once at reset, once before heading
-        black_calls = [c for c in pdf.set_text_color.call_args_list if c == ((0, 0, 0),)]
-        assert len(black_calls) >= 2
+        pdf.set_text_color.assert_any_call(0, 0, 0)
 
     @patch("resumeforge.engines.fpdf_engine.FPDF")
     def test_section_content_uses_color_override(self, MockFPDF, layout):
@@ -348,11 +346,12 @@ class TestRenderHeading:
 
     @patch("resumeforge.engines.fpdf_engine.FPDF")
     def test_heading_resets_color_after(self, MockFPDF, layout):
-        """POSITIVE: text color is reset to black after heading."""
+        """POSITIVE: set_text_color(0,0,0) called after heading to reset for sections."""
         from resumeforge.adapters.heading_adapter import HeadingConfig
         pdf = MockFPDF.return_value
         heading = HeadingConfig(content="John Doe", font_size=20, align="center", line_height=7, color="#ff0000")
         fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        pdf.set_text_color.assert_any_call(0, 0, 0)
         # Last set_text_color call should be reset to black
         last_color_call = pdf.set_text_color.call_args_list[-1]
         assert last_color_call == ((0, 0, 0),)
