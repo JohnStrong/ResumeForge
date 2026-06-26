@@ -49,16 +49,17 @@ def _render_heading(pdf: FPDF, heading_config: HeadingConfig | None, font_family
     line_height = int(heading_config.line_height) if isinstance(heading_config.line_height, str) else heading_config.line_height
     align = heading_config.align[0].upper()  # "center" -> "C", "left" -> "L", "right" -> "R"
 
-    if heading_config.color:
-        r, g, b = int(heading_config.color[1:3], 16), int(heading_config.color[3:5], 16), int(heading_config.color[5:7], 16)
-        pdf.set_text_color(r, g, b)
-
-    # First line: name — bold, at font_size
+    # First line: name — bold, always black
+    pdf.set_text_color(0, 0, 0)
     pdf.set_font(font_family, style="B", size=font_size)
     pdf.multi_cell(w=0, h=line_height, text=lines[0], align=align, new_x="LMARGIN", new_y="NEXT")
 
-    # Remaining lines: contact/title — regular, scaled down
+    # Remaining lines: contact/title — regular, scaled down, with color if set
     if len(lines) > 1:
+        if heading_config.color:
+            # TODO: extract hex-to-rgb conversion to a shared adapter utility
+            r, g, b = int(heading_config.color[1:3], 16), int(heading_config.color[3:5], 16), int(heading_config.color[5:7], 16)
+            pdf.set_text_color(r, g, b)
         contact_size = round(font_size * 0.55)
         pdf.set_font(font_family, style="", size=contact_size)
         for line in lines[1:]:

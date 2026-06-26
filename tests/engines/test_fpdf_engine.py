@@ -317,10 +317,10 @@ class TestRenderHeading:
 
     @patch("resumeforge.engines.fpdf_engine.FPDF")
     def test_heading_applies_color(self, MockFPDF, layout):
-        """POSITIVE: heading applies color when set."""
+        """POSITIVE: heading applies color to contact lines when set."""
         from resumeforge.adapters.heading_adapter import HeadingConfig
         pdf = MockFPDF.return_value
-        heading = HeadingConfig(content="John Doe", font_size=20, align="center", line_height=7, color="#336699")
+        heading = HeadingConfig(content="John Doe\njohn@email.com", font_size=20, align="center", line_height=7, color="#336699")
         fpdf_engine([], layout, "out.pdf", heading_config=heading)
         pdf.set_text_color.assert_any_call(51, 102, 153)
 
@@ -355,6 +355,37 @@ class TestRenderHeading:
         # Last set_text_color call should be reset to black
         last_color_call = pdf.set_text_color.call_args_list[-1]
         assert last_color_call == ((0, 0, 0),)
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_name_always_black(self, MockFPDF, layout):
+        """POSITIVE: applicant name (first line) is always rendered in black."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe\njohn@email.com", font_size=20, align="center", line_height=7, color="#336699")
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        # First set_text_color call should be black (for name)
+        first_color_call = pdf.set_text_color.call_args_list[0]
+        assert first_color_call == ((0, 0, 0),)
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_contact_uses_custom_color(self, MockFPDF, layout):
+        """POSITIVE: contact lines use the custom color when set in heading config."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe\njohn@email.com", font_size=20, align="center", line_height=7, color="#336699")
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        pdf.set_text_color.assert_any_call(51, 102, 153)
+
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_contact_uses_black_when_no_color(self, MockFPDF, layout):
+        """POSITIVE: contact lines stay black when no color is set in heading config."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe\njohn@email.com", font_size=20, align="center", line_height=7)
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        # All set_text_color calls should be black (0, 0, 0)
+        for call in pdf.set_text_color.call_args_list:
+            assert call == ((0, 0, 0),)
 
     @patch("resumeforge.engines.fpdf_engine.FPDF")
     def test_heading_adds_spacing_after(self, MockFPDF, layout):
