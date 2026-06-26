@@ -187,6 +187,14 @@ section[name="HEADER"] {
 }
 ```
 
+## Contributing
+
+1. Create a feature branch from `main`: `git checkout -b feature/your-feature`
+2. Make changes, commit using [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`)
+3. Ensure all tests pass: `pytest`
+4. Open a pull request for code review before merging
+5. Merge to `main` with `--no-ff` to preserve branch history
+
 ## Examples
 
 ### Step 1: Write your CV as plain text (`examples/resume.txt`)
