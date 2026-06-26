@@ -202,11 +202,19 @@ linkedin.com/in/loremipsum
 loremipsum.dev
 
 Skills
-Python, TypeScript, Go, Rust
-AWS (Lambda, DynamoDB, ECS, CDK), Terraform
-PostgreSQL, Redis, Kafka, gRPC
-System Design, Distributed Systems, CI/CD
-Docker, Kubernetes, Observability
+- Python, 
+- TypeScript
+- Go
+- Rust
+- AWS (Lambda, DynamoDB, ECS, CDK)
+- Terraform
+- PostgreSQL, 
+- Redis, 
+- Kafka
+- System Design
+- CI/CD
+- Kubernetes
+- Observability
 
 Work Experience
 Senior Software Engineer - Acme Widget Corp
@@ -247,14 +255,9 @@ consectetur@faketech.xyz
 ```css
 @font-face { font-family: "Carlito"; src: "examples/fonts/Carlito-Regular.ttf"; src-bold: "examples/fonts/Carlito-Bold.ttf"; }
 
-layout { mode: grid; columns: 2; column-widths: 35% 65%; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
+layout { mode: grid; columns: 2; column-widths: 30% 70%; column-gap: 6mm; margins: 20mm 18mm 20mm 18mm; font-family: "Carlito"; }
 
-section[name="Lorem Ipsum"] {
-  font-size: 22pt;
-  align: center;
-  line-height: 9;
-  grid-column: 1;
-}
+heading { font-size: 20pt; align: center; line-height: 7; color: #555555; }
 
 section[name="Links"] {
   color: #336699;

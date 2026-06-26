@@ -8,11 +8,19 @@ linkedin.com/in/loremipsum
 loremipsum.dev
 
 Skills
-Python, TypeScript, Go, Rust
-AWS (Lambda, DynamoDB, ECS, CDK), Terraform
-PostgreSQL, Redis, Kafka, gRPC
-System Design, Distributed Systems, CI/CD
-Docker, Kubernetes, Observability
+- Python, 
+- TypeScript
+- Go
+- Rust
+- AWS (Lambda, DynamoDB, ECS, CDK)
+- Terraform
+- PostgreSQL, 
+- Redis, 
+- Kafka
+- System Design
+- CI/CD
+- Kubernetes
+- Observability
 
 Work Experience
 Senior Software Engineer - Acme Widget Corp
