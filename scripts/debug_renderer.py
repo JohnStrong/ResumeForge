@@ -19,6 +19,7 @@ stylesheet = transform(result.tree)
 
 # Map CV heading and sections
 cv_text = (EXAMPLES_DIR / "resume.txt").read_text()
+
 styled_heading = map_heading(cv_text, stylesheet)
 styled_sections = SectionMapper().map(cv_text, stylesheet)
 

@@ -24,7 +24,7 @@ class TestHeadingAdapterPositive:
         ])
         heading = StyledHeading(content="Jane Smith", rule=rule)
         config = adapt_heading(heading)
-        assert config.font_size == "24"
+        assert config.font_size == 24
         assert config.align == "center"
         assert config.line_height == 7
 
@@ -35,7 +35,7 @@ class TestHeadingAdapterPositive:
         ])
         heading = StyledHeading(content="John Doe", rule=rule)
         config = adapt_heading(heading)
-        assert config.font_size == "24"
+        assert config.font_size == 24
 
     def test_overrides_align(self):
         """POSITIVE: align declaration overrides default center"""
@@ -53,7 +53,7 @@ class TestHeadingAdapterPositive:
         ])
         heading = StyledHeading(content="John Doe", rule=rule)
         config = adapt_heading(heading)
-        assert config.line_height == "9"
+        assert config.line_height == 9
 
     def test_multiple_overrides(self):
         """POSITIVE: multiple declarations override their respective defaults"""
@@ -64,9 +64,9 @@ class TestHeadingAdapterPositive:
         ])
         heading = StyledHeading(content="John Doe\nEngineer", rule=rule)
         config = adapt_heading(heading)
-        assert config.font_size == "22"
+        assert config.font_size == 22
         assert config.align == "right"
-        assert config.line_height == "8"
+        assert config.line_height == 8
         assert config.content == "John Doe\nEngineer"
 
     def test_returns_heading_config_instance(self):
