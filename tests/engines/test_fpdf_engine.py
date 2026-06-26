@@ -333,3 +333,12 @@ class TestRenderHeading:
         last_color_call = pdf.set_text_color.call_args_list[-1]
         assert last_color_call == ((0, 0, 0),)
 
+    @patch("resumeforge.engines.fpdf_engine.FPDF")
+    def test_heading_adds_spacing_after(self, MockFPDF, layout):
+        """POSITIVE: a line break is added after heading for spacing before sections."""
+        from resumeforge.adapters.heading_adapter import HeadingConfig
+        pdf = MockFPDF.return_value
+        heading = HeadingConfig(content="John Doe", font_size=20, align="center", line_height=7)
+        fpdf_engine([], layout, "out.pdf", heading_config=heading)
+        pdf.ln.assert_called_once_with(7)
+

@@ -67,6 +67,7 @@ def _render_heading(pdf: FPDF, heading_config: HeadingConfig | None, font_family
 
     # Reset for subsequent sections
     pdf.set_text_color(0, 0, 0)
+    pdf.ln(line_height)
 
 
 def _render_single(pdf: FPDF, sections: list[RenderSection], font_family: str) -> None:
