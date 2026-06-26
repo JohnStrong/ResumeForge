@@ -124,7 +124,7 @@ The `heading` block styles the resume header (name, title, contact info) that ap
 
 | Property | Values | Default | Description |
 |---|---|---|---|
-| `font-size` | e.g. `20pt` | `20pt` | Name/first line font size |
+| `font-size` | e.g. `20pt` | `20pt` | Name/first line font size. Subsequent lines (contact info, title) are scaled down proportionally |
 | `align` | `left`, `center`, `right` | `center` | Text alignment |
 | `line-height` | e.g. `7` | `7` | Line height in mm |
 | `color` | e.g. `#333333` | black | Text color (hex) |
