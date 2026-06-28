@@ -1,6 +1,6 @@
 # ResumeForge — README
 
-![build](https://github.com/JohnStrong/ResumeForge/actions/workflows/python-package.yml/badge.svg)
+![build](https://github.com/JohnStrong/ResumeForge/actions/workflows/python-package.yml/badge.svg?branch=main)
 ![coverage](https://codecov.io/gh/JohnStrong/ResumeForge/branch/main/graph/badge.svg)
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
 ![python](https://img.shields.io/badge/python-3.12+-yellow)
