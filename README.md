@@ -1,8 +1,8 @@
 # ResumeForge — README
 
+![build](https://github.com/JohnStrong/ResumeForge/actions/workflows/python-package.yml/badge.svg)
+![coverage](https://codecov.io/gh/JohnStrong/ResumeForge/branch/main/graph/badge.svg)
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
-![build](https://img.shields.io/badge/build-passing-brightgreen)
-![coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)
 ![python](https://img.shields.io/badge/python-3.12+-yellow)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
