@@ -13,5 +13,8 @@ dependencies = ["lark", "fpdf2"]
 [project.scripts]
 resumeforge = "resumeforge.cli:main"
 
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov", "pypdf"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
